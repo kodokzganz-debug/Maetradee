@@ -2,302 +2,1157 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#070a12">
-  <meta name="description" content="MAETRADE — Personal trading workspace.">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
   <title>MAETRADE — Trading Workspace</title>
+
+  <meta
+    name="description"
+    content="MAETRADE personal trading workspace"
+  >
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div class="background" aria-hidden="true">
-    <div class="stars"></div>
-    <div class="noise"></div>
-    <div class="orb orb-one"></div>
-    <div class="orb orb-two"></div>
-    <div class="orb orb-three"></div>
-  </div>
 
-  <div class="app-shell">
+  <!-- =========================
+       APP
+  ========================== -->
+
+  <div class="app">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
     <aside class="sidebar" id="sidebar">
+
       <div class="brand">
-        <div class="brand-mark">M</div>
-        <div>
-          <div class="brand-name">MAE<span>TRADE</span></div>
-          <div class="brand-caption">TRADING WORKSPACE</div>
+        <div class="brand-mark">
+          M
+        </div>
+
+        <div class="brand-text">
+          <span>MAE</span>TRADE
         </div>
       </div>
 
-      <div class="workspace-switcher">
-        <div class="workspace-avatar">M</div>
-        <div class="workspace-copy">
-          <strong>Personal Workspace</strong>
-          <span>Trading account</span>
-        </div>
-        <span class="chevron">⌄</span>
-      </div>
 
-      <nav class="navigation">
-        <div class="nav-group">
-          <div class="nav-label">OVERVIEW</div>
-          <button class="nav-item active" data-page="dashboard"><span class="nav-icon">⌂</span><span>Dashboard</span></button>
-        </div>
+      <nav class="sidebar-nav">
 
-        <div class="nav-group">
-          <div class="nav-label">WORKSPACE</div>
-          <button class="nav-item" data-page="analysis"><span class="nav-icon">⌁</span><span>Technical Analysis</span></button>
-          <button class="nav-item" data-page="journal"><span class="nav-icon">▤</span><span>Trading Journal</span></button>
-          <button class="nav-item" data-page="cashflow"><span class="nav-icon">◫</span><span>Cashflow</span></button>
-        </div>
+        <div class="nav-section">
+          <span class="nav-label">WORKSPACE</span>
 
-        <div class="nav-group nav-group-bottom">
-          <div class="nav-label">SYSTEM</div>
-          <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span><span>Settings</span></button>
-        </div>
-      </nav>
+          <button
+            class="nav-item active"
+            data-page="dashboard"
+            type="button"
+          >
+            <span class="nav-icon">⌂</span>
+            <span>Dashboard</span>
+          </button>
 
-      <div class="sidebar-footer">
-        <div class="account-card">
-          <div class="account-avatar">M</div>
-          <div class="account-copy">
-            <strong>Trader</strong>
-            <span>Personal account</span>
-          </div>
-          <button class="more-button" aria-label="Account options">•••</button>
-        </div>
-      </div>
-    </aside>
+          <button
+            class="nav-item"
+            data-page="analysis"
+            type="button"
+          >
+            <span class="nav-icon">◈</span>
+            <span>Technical Analysis</span>
+          </button>
 
-    <main class="main">
-      <header class="topbar">
-        <button class="mobile-menu" id="mobileMenu" aria-label="Open navigation">☰</button>
-        <div class="mobile-brand">MAE<span>TRADE</span></div>
-        <div class="topbar-spacer"></div>
-        <div class="topbar-actions">
-          <button class="icon-button" id="notificationButton" aria-label="Notifications">◌</button>
-          <button class="profile-button" id="profileButton">
-            <span class="profile-avatar">M</span>
-            <span class="profile-name">Trader</span>
-            <span class="profile-arrow">⌄</span>
+          <button
+            class="nav-item"
+            data-page="journal"
+            type="button"
+          >
+            <span class="nav-icon">▤</span>
+            <span>Trading Journal</span>
+          </button>
+
+          <button
+            class="nav-item"
+            data-page="cashflow"
+            type="button"
+          >
+            <span class="nav-icon">↗</span>
+            <span>Cashflow</span>
           </button>
         </div>
-      </header>
 
-      <!-- DASHBOARD -->
-      <section class="page active-page" id="dashboard">
-        <div class="page-heading">
+
+        <div class="nav-section nav-section-bottom">
+
+          <span class="nav-label">SYSTEM</span>
+
+          <button
+            class="nav-item"
+            data-page="settings"
+            type="button"
+          >
+            <span class="nav-icon">⚙</span>
+            <span>Settings</span>
+          </button>
+
+        </div>
+
+      </nav>
+
+
+      <div class="sidebar-footer">
+
+        <div class="sidebar-status">
+          <span class="status-dot"></span>
+
           <div>
-            <span class="eyebrow">OVERVIEW</span>
-            <h1>Good evening<span>.</span></h1>
-            <p>Here’s your trading workspace at a glance.</p>
-          </div>
-          <button class="primary-button" data-action="new-trade">+ New Trade</button>
-        </div>
-
-        <div class="stats-grid">
-          <article class="stat-card">
-            <div class="stat-top"><span>Total Balance</span><span class="stat-icon">◈</span></div>
-            <strong class="stat-value" id="balanceValue">$0.00</strong>
-            <div class="stat-bottom"><span id="balanceMeta">No closed trades</span><span>USD</span></div>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-top"><span>Total P/L</span><span class="stat-icon">↗</span></div>
-            <strong class="stat-value" id="profitValue">$0.00</strong>
-            <div class="stat-bottom"><span id="profitMeta">No data yet</span><span>All time</span></div>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-top"><span>Win Rate</span><span class="stat-icon">◒</span></div>
-            <strong class="stat-value" id="winRateValue">0.00%</strong>
-            <div class="stat-bottom"><span id="winMeta">No closed trades</span><span>All time</span></div>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-top"><span>Trades</span><span class="stat-icon">⌁</span></div>
-            <strong class="stat-value" id="tradesValue">0</strong>
-            <div class="stat-bottom"><span id="tradesMeta">No activity</span><span>All time</span></div>
-          </article>
-        </div>
-
-        <div class="dashboard-grid">
-          <article class="glass-card performance-card">
-            <div class="card-header">
-              <div>
-                <span class="card-eyebrow">PERFORMANCE</span>
-                <h2>Trading Performance</h2>
-              </div>
-              <div class="period-group">
-                <button class="period-button active" data-period="30">30D</button>
-                <button class="period-button" data-period="90">90D</button>
-                <button class="period-button" data-period="365">1Y</button>
-              </div>
-            </div>
-            <div class="chart-wrap">
-              <canvas id="performanceChart"></canvas>
-              <div class="chart-empty" id="chartEmpty">
-                <span class="empty-icon">⌁</span>
-                <strong>No performance data</strong>
-                <p>Close a trade to start building your equity curve.</p>
-              </div>
-            </div>
-          </article>
-
-          <article class="glass-card recent-card">
-            <div class="card-header">
-              <div>
-                <span class="card-eyebrow">ACTIVITY</span>
-                <h2>Recent Trades</h2>
-              </div>
-              <button class="text-button" data-page-link="journal">View all →</button>
-            </div>
-            <div class="recent-list" id="recentTrades">
-              <div class="empty-state compact">
-                <div class="empty-circle">⌁</div>
-                <strong>No trades yet</strong>
-                <p>Your recent trading activity will appear here.</p>
-                <button class="secondary-button" data-action="new-trade">Add your first trade</button>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <article class="glass-card market-card">
-          <div class="card-header">
-            <div>
-              <span class="card-eyebrow">MARKET</span>
-              <h2>Watchlist</h2>
-            </div>
-            <button class="text-button" data-page-link="analysis">Open analysis →</button>
-          </div>
-          <div class="watchlist">
-            <button class="watch-item" data-symbol="XAUUSD">
-              <span class="asset"><span class="asset-icon gold">X</span><span><strong>XAUUSD</strong><small>Gold / US Dollar</small></span></span>
-              <span class="watch-price"><strong>—</strong><small>Market feed offline</small></span>
-            </button>
-            <button class="watch-item" data-symbol="BTCUSD">
-              <span class="asset"><span class="asset-icon btc">₿</span><span><strong>BTCUSD</strong><small>Bitcoin / US Dollar</small></span></span>
-              <span class="watch-price"><strong>—</strong><small>Market feed offline</small></span>
-            </button>
-            <button class="watch-item" data-symbol="EURUSD">
-              <span class="asset"><span class="asset-icon eur">€</span><span><strong>EURUSD</strong><small>Euro / US Dollar</small></span></span>
-              <span class="watch-price"><strong>—</strong><small>Market feed offline</small></span>
-            </button>
-          </div>
-        </article>
-      </section>
-
-      <!-- ANALYSIS -->
-      <section class="page" id="analysis">
-        <div class="page-heading">
-          <div><span class="eyebrow">MARKET</span><h1>Technical Analysis<span>.</span></h1><p>Build and document your trading setup.</p></div>
-          <button class="secondary-button" data-action="new-trade">Create setup</button>
-        </div>
-        <div class="glass-card workspace-placeholder">
-          <div class="large-icon">⌁</div>
-          <h2>Analysis Workspace</h2>
-          <p>Live chart integration, market structure, FVG, BOS, CHoCH and setup tools will live here.</p>
-          <div class="feature-pills"><span>1H Bias</span><span>15M Entry</span><span>SMC</span><span>FVG</span><span>Risk 1%</span><span>R:R 1:2</span></div>
-        </div>
-      </section>
-
-      <!-- JOURNAL -->
-      <section class="page" id="journal">
-        <div class="page-heading">
-          <div><span class="eyebrow">RECORD</span><h1>Trading Journal<span>.</span></h1><p>Document every trade and review your execution.</p></div>
-          <button class="primary-button" data-action="new-trade">+ New Trade</button>
-        </div>
-        <div class="glass-card journal-card">
-          <div class="journal-toolbar">
-            <div class="journal-count" id="journalCount">0 trades</div>
-            <div class="journal-filters">
-              <button class="filter-button active" data-filter="ALL">All</button>
-              <button class="filter-button" data-filter="OPEN">Open</button>
-              <button class="filter-button" data-filter="CLOSED">Closed</button>
-              <button class="filter-button" data-filter="BUY">Buy</button>
-              <button class="filter-button" data-filter="SELL">Sell</button>
-            </div>
-          </div>
-          <div class="trade-table-wrap">
-            <table class="trade-table">
-              <thead><tr><th>Trade</th><th>Side</th><th>Entry</th><th>SL / TP</th><th>Open time</th><th>Status</th><th>P/L</th><th></th></tr></thead>
-              <tbody id="tradeTableBody"></tbody>
-            </table>
-          </div>
-          <div class="journal-empty" id="journalEmpty">
-            <div class="large-icon">▤</div>
-            <h2>Your Journal is Empty</h2>
-            <p>Create your first trade and it will appear here.</p>
-            <button class="primary-button" data-action="new-trade">+ New Trade</button>
+            <strong>Workspace</strong>
+            <small>Local storage active</small>
           </div>
         </div>
-      </section>
 
-      <!-- CASHFLOW -->
-      <section class="page" id="cashflow">
-        <div class="page-heading">
-          <div><span class="eyebrow">FINANCE</span><h1>Cashflow<span>.</span></h1><p>Track deposits, withdrawals, income and expenses.</p></div>
-          <button class="primary-button" data-action="add-transaction">+ Add Transaction</button>
-        </div>
-        <div class="cashflow-grid">
-          <div class="glass-card mini-card"><span>Net Cashflow</span><strong>$0.00</strong><small>No transactions yet</small></div>
-          <div class="glass-card mini-card"><span>Deposits</span><strong>$0.00</strong><small>Not recorded</small></div>
-          <div class="glass-card mini-card"><span>Expenses</span><strong>$0.00</strong><small>Not recorded</small></div>
-        </div>
-        <div class="glass-card workspace-placeholder small-placeholder">
-          <div class="large-icon">◫</div><h2>Cashflow ledger</h2><p>Your personal and trading cashflow records will appear here.</p>
-        </div>
-      </section>
-
-      <!-- SETTINGS -->
-      <section class="page" id="settings">
-        <div class="page-heading">
-          <div><span class="eyebrow">SYSTEM</span><h1>Settings<span>.</span></h1><p>Configure your MAETRADE workspace.</p></div>
-        </div>
-        <div class="glass-card settings-card">
-          <div class="setting-row"><div><strong>Account</strong><span>Personal trading workspace</span></div><button class="secondary-button">Configure</button></div>
-          <div class="setting-row"><div><strong>Risk Management</strong><span>Default risk per trade</span></div><strong class="setting-value">1%</strong></div>
-          <div class="setting-row"><div><strong>Default Risk / Reward</strong><span>Preferred trading ratio</span></div><strong class="setting-value">1 : 2</strong></div>
-          <div class="setting-row"><div><strong>Data Storage</strong><span>Local browser storage — V1</span></div><strong class="setting-value">LOCAL</strong></div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <!-- TRADE MODAL -->
-  <div class="modal-backdrop" id="tradeModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tradeModalTitle">
-      <div class="modal-header">
-        <div><span class="card-eyebrow">TRADE RECORD</span><h2 id="tradeModalTitle">New Trade</h2></div>
-        <button class="modal-close" data-close-modal aria-label="Close">×</button>
       </div>
 
-      <form id="tradeForm">
-        <input type="hidden" id="tradeId">
-        <div class="form-grid">
-          <label class="field full"><span>Symbol</span><input id="symbol" name="symbol" value="XAUUSD" list="symbols" required><datalist id="symbols"><option value="XAUUSD"><option value="BTCUSD"><option value="EURUSD"><option value="GBPUSD"><option value="USDJPY"></datalist></label>
-          <div class="field full"><span>Direction</span><div class="segmented"><button type="button" class="side-option active" data-side="BUY">BUY</button><button type="button" class="side-option" data-side="SELL">SELL</button></div><input type="hidden" id="side" value="BUY"></div>
-          <label class="field"><span>Volume</span><input id="volume" type="number" step="0.01" min="0" placeholder="0.01" required></label>
-          <label class="field"><span>Entry Price</span><input id="entry" type="number" step="0.00001" min="0" placeholder="3500.00" required></label>
-          <label class="field"><span>Stop Loss</span><input id="sl" type="number" step="0.00001" min="0" placeholder="3490.00"></label>
-          <label class="field"><span>Take Profit</span><input id="tp" type="number" step="0.00001" min="0" placeholder="3520.00"></label>
-          <label class="field"><span>Open Time</span><input id="openTime" type="datetime-local" required></label>
-          <label class="field"><span>Status</span><select id="status"><option value="OPEN">OPEN</option><option value="CLOSED">CLOSED</option></select></label>
-          <label class="field"><span>Close Price <em>optional</em></span><input id="closePrice" type="number" step="0.00001" min="0" placeholder="—"></label>
-          <label class="field"><span>Profit / Loss <em>USD</em></span><input id="profit" type="number" step="0.01" placeholder="0.00"></label>
-          <label class="field full"><span>Notes</span><textarea id="notes" rows="3" placeholder="Setup, market context, execution notes..."></textarea></label>
+    </aside>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main class="main">
+
+      <!-- =========================
+           TOPBAR
+      ========================== -->
+
+      <header class="topbar">
+
+        <button
+          class="mobile-menu"
+          id="mobileMenu"
+          type="button"
+          aria-label="Open menu"
+        >
+          ☰
+        </button>
+
+
+        <div class="topbar-left">
+
+          <div class="breadcrumb">
+            <span>Workspace</span>
+            <span class="breadcrumb-separator">/</span>
+            <strong id="pageBreadcrumb">Dashboard</strong>
+          </div>
+
         </div>
-        <div class="modal-footer">
-          <button type="button" class="secondary-button" data-close-modal>Cancel</button>
-          <button type="submit" class="primary-button" id="saveTradeButton">Save Trade</button>
+
+
+        <div class="topbar-right">
+
+          <button
+            class="icon-button"
+            id="notificationButton"
+            type="button"
+            aria-label="Notifications"
+          >
+            ♢
+            <span class="notification-dot"></span>
+          </button>
+
+
+          <button
+            class="profile-button"
+            id="profileButton"
+            type="button"
+          >
+
+            <span class="avatar">
+              K
+            </span>
+
+            <span class="profile-info">
+              <strong>Trader</strong>
+              <small>Personal</small>
+            </span>
+
+            <span class="profile-arrow">⌄</span>
+
+          </button>
+
         </div>
-      </form>
-    </div>
+
+      </header>
+
+
+      <!-- =========================
+           PAGE CONTENT
+      ========================== -->
+
+      <div class="content">
+
+
+        <!-- =====================================================
+             DASHBOARD
+        ====================================================== -->
+
+        <section
+          class="page active"
+          id="page-dashboard"
+        >
+
+          <div class="page-header">
+
+            <div>
+              <span class="eyebrow">OVERVIEW</span>
+
+              <h1>
+                Trading Dashboard
+              </h1>
+
+              <p>
+                Monitor your trading performance and activity.
+              </p>
+            </div>
+
+
+            <button
+              class="primary-button"
+              id="newTradeButton"
+              type="button"
+            >
+              <span>＋</span>
+              New Trade
+            </button>
+
+          </div>
+
+
+          <!-- STAT CARDS -->
+
+          <div class="stats-grid">
+
+            <article class="stat-card">
+
+              <div class="stat-top">
+                <span class="stat-label">
+                  Total Balance
+                </span>
+
+                <span class="stat-icon">
+                  $
+                </span>
+              </div>
+
+              <strong
+                class="stat-value"
+                id="totalBalance"
+              >
+                $0.00
+              </strong>
+
+              <span class="stat-meta">
+                Current workspace
+              </span>
+
+            </article>
+
+
+            <article class="stat-card">
+
+              <div class="stat-top">
+                <span class="stat-label">
+                  Total P/L
+                </span>
+
+                <span class="stat-icon">
+                  ↗
+                </span>
+              </div>
+
+              <strong
+                class="stat-value"
+                id="totalPL"
+              >
+                $0.00
+              </strong>
+
+              <span
+                class="stat-meta"
+                id="plMeta"
+              >
+                No closed trades
+              </span>
+
+            </article>
+
+
+            <article class="stat-card">
+
+              <div class="stat-top">
+                <span class="stat-label">
+                  Win Rate
+                </span>
+
+                <span class="stat-icon">
+                  %
+                </span>
+              </div>
+
+              <strong
+                class="stat-value"
+                id="winRate"
+              >
+                0%
+              </strong>
+
+              <span class="stat-meta">
+                Based on closed trades
+              </span>
+
+            </article>
+
+
+            <article class="stat-card">
+
+              <div class="stat-top">
+                <span class="stat-label">
+                  Trades
+                </span>
+
+                <span class="stat-icon">
+                  #
+                </span>
+              </div>
+
+              <strong
+                class="stat-value"
+                id="tradeCount"
+              >
+                0
+              </strong>
+
+              <span class="stat-meta">
+                Recorded trades
+              </span>
+
+            </article>
+
+          </div>
+
+
+          <!-- MAIN DASHBOARD GRID -->
+
+          <div class="dashboard-grid">
+
+
+            <!-- PERFORMANCE -->
+
+            <article class="panel performance-panel">
+
+              <div class="panel-header">
+
+                <div>
+                  <span class="panel-kicker">
+                    PERFORMANCE
+                  </span>
+
+                  <h2>
+                    Trading Performance
+                  </h2>
+                </div>
+
+
+                <select
+                  class="period-select"
+                  id="performancePeriod"
+                >
+                  <option value="7">7 Days</option>
+                  <option value="30" selected>30 Days</option>
+                  <option value="90">90 Days</option>
+                  <option value="all">All Time</option>
+                </select>
+
+              </div>
+
+
+              <div
+                class="performance-chart"
+                id="performanceChart"
+              >
+
+                <div class="chart-grid-line line-1"></div>
+                <div class="chart-grid-line line-2"></div>
+                <div class="chart-grid-line line-3"></div>
+                <div class="chart-grid-line line-4"></div>
+
+                <div class="chart-empty">
+
+                  <div class="chart-empty-icon">
+                    ◌
+                  </div>
+
+                  <strong>
+                    No performance data
+                  </strong>
+
+                  <span>
+                    Add closed trades to build your performance chart.
+                  </span>
+
+                </div>
+
+              </div>
+
+            </article>
+
+
+            <!-- WATCHLIST -->
+
+            <article class="panel watchlist-panel">
+
+              <div class="panel-header">
+
+                <div>
+                  <span class="panel-kicker">
+                    MARKET
+                  </span>
+
+                  <h2>
+                    Watchlist
+                  </h2>
+                </div>
+
+                <span class="live-status">
+                  <span></span>
+                  LIVE
+                </span>
+
+              </div>
+
+
+              <div class="watchlist">
+
+                <button
+                  class="watch-item"
+                  data-symbol="XAUUSD"
+                  type="button"
+                >
+
+                  <div class="watch-symbol">
+                    <span class="coin-icon gold">Au</span>
+
+                    <div>
+                      <strong>XAUUSD</strong>
+                      <small>Gold / USD</small>
+                    </div>
+                  </div>
+
+                  <div class="watch-price">
+                    <strong>—</strong>
+                    <small>—</small>
+                  </div>
+
+                </button>
+
+
+                <button
+                  class="watch-item"
+                  data-symbol="BTCUSD"
+                  type="button"
+                >
+
+                  <div class="watch-symbol">
+                    <span class="coin-icon btc">₿</span>
+
+                    <div>
+                      <strong>BTCUSD</strong>
+                      <small>Bitcoin / USD</small>
+                    </div>
+                  </div>
+
+                  <div class="watch-price">
+                    <strong>—</strong>
+                    <small>—</small>
+                  </div>
+
+                </button>
+
+
+                <button
+                  class="watch-item"
+                  data-symbol="EURUSD"
+                  type="button"
+                >
+
+                  <div class="watch-symbol">
+                    <span class="coin-icon eur">€</span>
+
+                    <div>
+                      <strong>EURUSD</strong>
+                      <small>Euro / USD</small>
+                    </div>
+                  </div>
+
+                  <div class="watch-price">
+                    <strong>—</strong>
+                    <small>—</small>
+                  </div>
+
+                </button>
+
+              </div>
+
+            </article>
+
+          </div>
+
+
+          <!-- RECENT TRADES -->
+
+          <article class="panel recent-panel">
+
+            <div class="panel-header">
+
+              <div>
+                <span class="panel-kicker">
+                  ACTIVITY
+                </span>
+
+                <h2>
+                  Recent Trades
+                </h2>
+              </div>
+
+
+              <button
+                class="text-button"
+                id="viewAllTrades"
+                type="button"
+              >
+                View all →
+              </button>
+
+            </div>
+
+
+            <div
+              class="recent-trades-list"
+              id="recentTradesList"
+            >
+
+              <div class="empty-state">
+
+                <div class="empty-icon">
+                  ◇
+                </div>
+
+                <strong>
+                  No trades yet
+                </strong>
+
+                <span>
+                  Start tracking your trades by adding your first position.
+                </span>
+
+                <button
+                  class="secondary-button"
+                  id="emptyNewTradeButton"
+                  type="button"
+                >
+                  Add your first trade
+                </button>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- =====================================================
+             TECHNICAL ANALYSIS
+        ====================================================== -->
+
+        <section
+          class="page"
+          id="page-analysis"
+        >
+
+          <div class="page-header">
+
+            <div>
+              <span class="eyebrow">MARKET</span>
+
+              <h1>
+                Technical Analysis
+              </h1>
+
+              <p>
+                Analyze market structure and prepare your next setup.
+              </p>
+            </div>
+
+          </div>
+
+
+          <div class="analysis-layout">
+
+            <article class="panel analysis-chart-panel">
+
+              <div class="panel-header">
+
+                <div>
+                  <span class="panel-kicker">
+                    CHART
+                  </span>
+
+                  <h2 id="analysisSymbol">
+                    XAUUSD
+                  </h2>
+                </div>
+
+
+                <div class="chart-controls">
+
+                  <button
+                    class="chart-time active"
+                    type="button"
+                  >
+                    15M
+                  </button>
+
+                  <button
+                    class="chart-time"
+                    type="button"
+                  >
+                    1H
+                  </button>
+
+                  <button
+                    class="chart-time"
+                    type="button"
+                  >
+                    4H
+                  </button>
+
+                </div>
+
+              </div>
+
+
+              <div class="big-chart">
+
+                <div class="chart-watermark">
+                  MAETRADE
+                </div>
+
+                <div class="chart-placeholder">
+
+                  <span>
+                    Technical chart
+                  </span>
+
+                  <small>
+                    Live chart integration can be connected here.
+                  </small>
+
+                </div>
+
+              </div>
+
+            </article>
+
+
+            <article class="panel setup-panel">
+
+              <div class="panel-header">
+
+                <div>
+                  <span class="panel-kicker">
+                    SETUP
+                  </span>
+
+                  <h2>
+                    Trade Plan
+                  </h2>
+                </div>
+
+              </div>
+
+
+              <div class="setup-list">
+
+                <div class="setup-row">
+                  <span>Bias</span>
+                  <strong>—</strong>
+                </div>
+
+                <div class="setup-row">
+                  <span>Market Structure</span>
+                  <strong>—</strong>
+                </div>
+
+                <div class="setup-row">
+                  <span>Entry</span>
+                  <strong>—</strong>
+                </div>
+
+                <div class="setup-row">
+                  <span>Stop Loss</span>
+                  <strong>—</strong>
+                </div>
+
+                <div class="setup-row">
+                  <span>Take Profit</span>
+                  <strong>—</strong>
+                </div>
+
+                <div class="setup-row">
+                  <span>Risk / Reward</span>
+                  <strong>1 : 2</strong>
+                </div>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             JOURNAL
+        ====================================================== -->
+
+        <section
+          class="page"
+          id="page-journal"
+        >
+
+          <div class="page-header">
+
+            <div>
+              <span class="eyebrow">RECORD</span>
+
+              <h1>
+                Trading Journal
+              </h1>
+
+              <p>
+                Review every trade and document your execution.
+              </p>
+            </div>
+
+
+            <button
+              class="primary-button"
+              id="newJournalButton"
+              type="button"
+            >
+              <span>＋</span>
+              New Journal
+            </button>
+
+          </div>
+
+
+          <article class="panel journal-panel">
+
+            <div class="panel-header">
+
+              <div>
+                <span class="panel-kicker">
+                  TRADE LOG
+                </span>
+
+                <h2>
+                  Journal Entries
+                </h2>
+              </div>
+
+            </div>
+
+
+            <div
+              class="journal-table-container"
+              id="journalTableContainer"
+            >
+
+              <div class="empty-state">
+
+                <div class="empty-icon">
+                  ✦
+                </div>
+
+                <strong>
+                  Your journal is empty
+                </strong>
+
+                <span>
+                  Your recorded trades will appear here.
+                </span>
+
+                <button
+                  class="secondary-button"
+                  id="journalEmptyButton"
+                  type="button"
+                >
+                  Create journal entry
+                </button>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- =====================================================
+             CASHFLOW
+        ====================================================== -->
+
+        <section
+          class="page"
+          id="page-cashflow"
+        >
+
+          <div class="page-header">
+
+            <div>
+              <span class="eyebrow">FINANCE</span>
+
+              <h1>
+                Cashflow
+              </h1>
+
+              <p>
+                Track deposits, withdrawals and personal trading cashflow.
+              </p>
+
+            </div>
+
+
+            <button
+              class="primary-button"
+              id="addTransactionButton"
+              type="button"
+            >
+              <span>＋</span>
+              Add Transaction
+            </button>
+
+          </div>
+
+
+          <div class="stats-grid cashflow-stats">
+
+            <article class="stat-card">
+
+              <div class="stat-top">
+                <span class="stat-label">
+                  Total Deposit
+                </span>
+
+                <span class="stat-icon">
+                  ↓
+                </span>
+              </div>
+
+              <strong class="stat-value">
+                $0.00
+              </strong>
+
+            </article>
+
+
+            <article class="stat-card">
+
+              <div class="stat-top">
+                <span class="stat-label">
+                  Total Withdrawal
+                </span>
+
+                <span class="stat-icon">
+                  ↑
+                </span>
+              </div>
+
+              <strong class="stat-value">
+                $0.00
+              </strong>
+
+            </article>
+
+
+            <article class="stat-card">
+
+              <div class="stat-top">
+                <span class="stat-label">
+                  Net Cashflow
+                </span>
+
+                <span class="stat-icon">
+                  $
+                </span>
+              </div>
+
+              <strong class="stat-value">
+                $0.00
+              </strong>
+
+            </article>
+
+          </div>
+
+
+          <article class="panel">
+
+            <div class="empty-state large-empty">
+
+              <div class="empty-icon">
+                $
+              </div>
+
+              <strong>
+                No cashflow recorded
+              </strong>
+
+              <span>
+                Add deposits or withdrawals to start tracking your cashflow.
+              </span>
+
+              <button
+                class="secondary-button"
+                id="cashflowEmptyButton"
+                type="button"
+              >
+                Add transaction
+              </button>
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- =====================================================
+             SETTINGS
+        ====================================================== -->
+
+        <section
+          class="page"
+          id="page-settings"
+        >
+
+          <div class="page-header">
+
+            <div>
+              <span class="eyebrow">SYSTEM</span>
+
+              <h1>
+                Settings
+              </h1>
+
+              <p>
+                Configure your trading workspace.
+              </p>
+            </div>
+
+          </div>
+
+
+          <div class="settings-grid">
+
+            <article class="panel settings-card">
+
+              <div class="panel-header">
+
+                <div>
+                  <span class="panel-kicker">
+                    ACCOUNT
+                  </span>
+
+                  <h2>
+                    Trading Account
+                  </h2>
+                </div>
+
+              </div>
+
+
+              <div class="setting-item">
+
+                <div>
+                  <strong>
+                    Account Type
+                  </strong>
+
+                  <small>
+                    Personal trading workspace
+                  </small>
+                </div>
+
+                <span class="setting-value">
+                  Personal
+                </span>
+
+              </div>
+
+
+              <div class="setting-item">
+
+                <div>
+                  <strong>
+                    Storage
+                  </strong>
+
+                  <small>
+                    Trades stored locally on this device
+                  </small>
+                </div>
+
+                <span class="setting-value success">
+                  Local
+                </span>
+
+              </div>
+
+            </article>
+
+
+            <article class="panel settings-card">
+
+              <div class="panel-header">
+
+                <div>
+                  <span class="panel-kicker">
+                    RISK MANAGEMENT
+                  </span>
+
+                  <h2>
+                    Risk Settings
+                  </h2>
+                </div>
+
+              </div>
+
+
+              <div class="setting-item">
+
+                <div>
+                  <strong>
+                    Risk per Trade
+                  </strong>
+
+                  <small>
+                    Maximum planned risk
+                  </small>
+                </div>
+
+                <span class="setting-value">
+                  1%
+                </span>
+
+              </div>
+
+
+              <div class="setting-item">
+
+                <div>
+                  <strong>
+                    Risk / Reward
+                  </strong>
+
+                  <small>
+                    Default trade target
+                  </small>
+                </div>
+
+                <span class="setting-value">
+                  1 : 2
+                </span>
+
+              </div>
+
+            </article>
+
+          </div>
+
+
+          <article class="panel danger-panel">
+
+            <div>
+
+              <span class="panel-kicker">
+                DATA
+              </span>
+
+              <h2>
+                Workspace Data
+              </h2>
+
+              <p>
+                Your trades are currently stored in this browser's local
+                storage.
+              </p>
+
+            </div>
+
+
+            <button
+              class="danger-button"
+              id="clearTradesButton"
+              type="button"
+            >
+              Clear Trade Data
+            </button>
+
+          </article>
+
+        </section>
+
+
+      </div>
+
+    </main>
+
   </div>
 
-  <div class="toast" id="toast" role="status"></div>
+
+  <!-- =========================
+       SIDEBAR OVERLAY
+  ========================== -->
+
+  <div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+  ></div>
+
+
+  <!-- =========================
+       SCRIPT
+  ========================== -->
+
   <script src="script.js"></script>
+
 </body>
-</html>
+  </html>
