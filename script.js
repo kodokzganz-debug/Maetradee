@@ -1,1124 +1,1328 @@
+"use strict";
+
 /* =========================================================
-   MAETRADE — V1 APPLICATION LOGIC
-   Navigation / Trade CRUD / Journal / Dashboard
-   LocalStorage version
+   MAETRADE — SIMPLE TRADING WORKSPACE
+   Storage: localStorage
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
-  "use strict";
+const STORAGE_KEY = "maetrade_trades_v1";
 
-  /* =======================================================
-     STORAGE
-  ======================================================= */
+let trades = [];
 
-  const STORAGE_KEY = "maetrade_trades_v1";
 
-  function getTrades() {
-    try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error("MAETRADE storage error:", error);
-      return [];
-    }
-  }
+// =========================================================
+// STORAGE
+// =========================================================
 
-  function saveTrades(trades) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trades));
-  }
+function loadTrades() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
 
-  /* =======================================================
-     NAVIGATION
-  ======================================================= */
-
-  const navItems = document.querySelectorAll(".nav-item");
-  const pages = document.querySelectorAll(".page");
-
-  function showPage(pageId) {
-    pages.forEach((page) => {
-      page.classList.toggle(
-        "active-page",
-        page.id === pageId
-      );
-    });
-
-    navItems.forEach((item) => {
-      item.classList.toggle(
-        "active",
-        item.dataset.page === pageId
-      );
-    });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-
-    history.replaceState(
-      null,
-      "",
-      `#${pageId}`
-    );
-  }
-
-  navItems.forEach((item) => {
-    item.addEventListener("click", () => {
-      const pageId = item.dataset.page;
-
-      if (pageId) {
-        showPage(pageId);
-      }
-    });
-  });
-
-  function loadInitialPage() {
-    const hash = window.location.hash.replace("#", "");
-
-    const validPages = [
-      "dashboard",
-      "analysis",
-      "journal",
-      "cashflow",
-      "settings"
-    ];
-
-    showPage(
-      validPages.includes(hash)
-        ? hash
-        : "dashboard"
-    );
-  }
-
-  loadInitialPage();
-
-  /* =======================================================
-     HELPERS
-  ======================================================= */
-
-  function formatMoney(value) {
-    const number = Number(value) || 0;
-
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2
-    }).format(number);
-  }
-
-  function formatNumber(value, digits = 2) {
-    const number = Number(value) || 0;
-
-    return number.toLocaleString("en-US", {
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits
-    });
-  }
-
-  function escapeHTML(value) {
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function generateId() {
-    return Date.now().toString(36) +
-      Math.random().toString(36).slice(2);
-  }
-
-  function calculateTradePL(trade) {
-    if (
-      trade.status === "CLOSED" &&
-      trade.profit !== undefined &&
-      trade.profit !== ""
-    ) {
-      return Number(trade.profit) || 0;
+    if (!saved) {
+      trades = [];
+      return;
     }
 
+    const parsed = JSON.parse(saved);
+
+    trades = Array.isArray(parsed) ? parsed : [];
+
+  } catch (error) {
+    console.error("Failed to load trades:", error);
+    trades = [];
+  }
+}
+
+
+function saveTrades() {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(trades)
+    );
+  } catch (error) {
+    console.error("Failed to save trades:", error);
+  }
+}
+
+
+// =========================================================
+// HELPERS
+// =========================================================
+
+function money(value) {
+
+  const number = Number(value) || 0;
+
+  const sign = number < 0 ? "-" : "";
+
+  return (
+    sign +
+    "$" +
+    Math.abs(number).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })
+  );
+}
+
+
+function escapeHTML(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+function generateId() {
+
+  return (
+    Date.now().toString(36) +
+    Math.random().toString(36).slice(2, 8)
+  );
+}
+
+
+function calculateWinRate() {
+
+  const closed = trades.filter(
+    trade => trade.status === "CLOSED"
+  );
+
+  if (!closed.length) {
     return 0;
   }
 
-  /* =======================================================
-     CREATE TRADE MODAL
-  ======================================================= */
+  const wins = closed.filter(
+    trade => Number(trade.profit) > 0
+  ).length;
 
-  function createTradeModal() {
-    if (document.getElementById("trade-modal")) {
-      return;
-    }
+  return Math.round(
+    (wins / closed.length) * 100
+  );
+}
 
-    const modal = document.createElement("div");
 
-    modal.id = "trade-modal";
+function getTotalPL() {
 
-    modal.innerHTML = `
-      <div class="modal-backdrop"></div>
+  return trades
+    .filter(trade => trade.status === "CLOSED")
+    .reduce(
+      (total, trade) =>
+        total + (Number(trade.profit) || 0),
+      0
+    );
+}
 
-      <div class="trade-modal-card">
 
-        <div class="trade-modal-header">
-          <div>
-            <span class="eyebrow">TRADE ENTRY</span>
-            <h2>New Trade</h2>
-          </div>
+// =========================================================
+// NAVIGATION
+// =========================================================
 
-          <button
-            type="button"
-            class="modal-close"
-            id="close-trade-modal"
-          >
-            ×
-          </button>
-        </div>
+const navItems =
+  document.querySelectorAll(".nav-item");
 
-        <form id="trade-form">
+const pages =
+  document.querySelectorAll(".page");
 
-          <div class="form-grid">
+const pageTitle =
+  document.getElementById("pageTitle");
 
-            <label>
-              <span>Symbol</span>
-              <input
-                name="symbol"
-                type="text"
-                placeholder="XAUUSD"
-                value="XAUUSD"
-                required
-              />
-            </label>
 
-            <label>
-              <span>Side</span>
-              <select name="side">
-                <option value="BUY">BUY</option>
-                <option value="SELL">SELL</option>
-              </select>
-            </label>
+const pageNames = {
+  dashboard: "Dashboard",
+  analysis: "Technical Analysis",
+  journal: "Trading Journal",
+  cashflow: "Cashflow",
+  settings: "Settings"
+};
 
-            <label>
-              <span>Volume</span>
-              <input
-                name="volume"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.01"
-                required
-              />
-            </label>
 
-            <label>
-              <span>Status</span>
-              <select name="status">
-                <option value="OPEN">OPEN</option>
-                <option value="CLOSED">CLOSED</option>
-              </select>
-            </label>
+function showPage(pageName) {
 
-            <label>
-              <span>Entry Price</span>
-              <input
-                name="entry_price"
-                type="number"
-                step="any"
-                placeholder="3500.00"
-                required
-              />
-            </label>
+  pages.forEach(page => {
 
-            <label>
-              <span>Close Price</span>
-              <input
-                name="close_price"
-                type="number"
-                step="any"
-                placeholder="Optional"
-              />
-            </label>
+    page.classList.remove("active");
 
-            <label>
-              <span>Stop Loss</span>
-              <input
-                name="sl"
-                type="number"
-                step="any"
-                placeholder="3490.00"
-              />
-            </label>
+  });
 
-            <label>
-              <span>Take Profit</span>
-              <input
-                name="tp"
-                type="number"
-                step="any"
-                placeholder="3520.00"
-              />
-            </label>
 
-            <label>
-              <span>P/L USD</span>
-              <input
-                name="profit"
-                type="number"
-                step="any"
-                placeholder="0.00"
-              />
-            </label>
+  const target =
+    document.getElementById(pageName);
 
-            <label>
-              <span>Open Time</span>
-              <input
-                name="open_time"
-                type="datetime-local"
-                required
-              />
-            </label>
-
-          </div>
-
-          <label class="form-full">
-            <span>Notes</span>
-            <textarea
-              name="notes"
-              rows="4"
-              placeholder="Trade reasoning, setup, psychology..."
-            ></textarea>
-          </label>
-
-          <div class="modal-actions">
-
-            <button
-              type="button"
-              class="secondary-button"
-              id="cancel-trade"
-            >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              class="primary-button"
-            >
-              Save Trade
-            </button>
-
-          </div>
-
-        </form>
-
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    document
-      .getElementById("close-trade-modal")
-      ?.addEventListener("click", closeTradeModal);
-
-    document
-      .getElementById("cancel-trade")
-      ?.addEventListener("click", closeTradeModal);
-
-    modal
-      .querySelector(".modal-backdrop")
-      ?.addEventListener("click", closeTradeModal);
-
-    document
-      .getElementById("trade-form")
-      ?.addEventListener("submit", handleTradeSubmit);
+  if (target) {
+    target.classList.add("active");
   }
 
-  function openTradeModal() {
-    createTradeModal();
 
-    const modal =
-      document.getElementById("trade-modal");
+  navItems.forEach(item => {
 
-    if (!modal) return;
+    item.classList.toggle(
+      "active",
+      item.dataset.page === pageName
+    );
 
-    const form =
-      document.getElementById("trade-form");
+  });
 
-    if (form) {
-      form.reset();
 
-      const symbol =
-        form.querySelector('[name="symbol"]');
+  if (pageTitle) {
 
-      const status =
-        form.querySelector('[name="status"]');
+    pageTitle.textContent =
+      pageNames[pageName] || "Dashboard";
 
-      if (symbol) symbol.value = "XAUUSD";
-      if (status) status.value = "OPEN";
-
-      const openTime =
-        form.querySelector('[name="open_time"]');
-
-      if (openTime) {
-        const now = new Date();
-
-        const local =
-          new Date(
-            now.getTime() -
-            now.getTimezoneOffset() * 60000
-          )
-            .toISOString()
-            .slice(0, 16);
-
-        openTime.value = local;
-      }
-    }
-
-    modal.classList.add("show");
-    document.body.classList.add("modal-open");
   }
 
-  function closeTradeModal() {
-    const modal =
-      document.getElementById("trade-modal");
 
-    if (!modal) return;
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
 
-    modal.classList.remove("show");
-    document.body.classList.remove("modal-open");
+
+navItems.forEach(item => {
+
+  item.addEventListener("click", () => {
+
+    const page =
+      item.dataset.page;
+
+    showPage(page);
+
+  });
+
+});
+
+
+// =========================================================
+// DASHBOARD
+// =========================================================
+
+function updateDashboard() {
+
+  const totalBalance =
+    document.getElementById("totalBalance");
+
+  const totalPL =
+    document.getElementById("totalPL");
+
+  const winRate =
+    document.getElementById("winRate");
+
+  const tradeCount =
+    document.getElementById("tradeCount");
+
+  const plMeta =
+    document.getElementById("plMeta");
+
+
+  const pl =
+    getTotalPL();
+
+  const wins =
+    calculateWinRate();
+
+
+  /*
+    Tidak ada starting balance
+    di versi ini, jadi Total Balance
+    tetap $0 agar tidak menyesatkan.
+  */
+
+  if (totalBalance) {
+    totalBalance.textContent = "$0.00";
   }
 
-  /* =======================================================
-     TRADE SUBMIT
-  ======================================================= */
 
-  function handleTradeSubmit(event) {
-    event.preventDefault();
+  if (totalPL) {
 
-    const form = event.currentTarget;
-    const data = new FormData(form);
+    totalPL.textContent =
+      money(pl);
 
-    const trade = {
-      id: generateId(),
-
-      ticket:
-        "MAE-" +
-        Date.now().toString().slice(-6),
-
-      account_id:
-        "personal",
-
-      symbol:
-        String(data.get("symbol") || "")
-          .trim()
-          .toUpperCase(),
-
-      side:
-        data.get("side") || "BUY",
-
-      volume:
-        Number(data.get("volume")) || 0,
-
-      entry_price:
-        Number(data.get("entry_price")) || 0,
-
-      sl:
-        Number(data.get("sl")) || 0,
-
-      tp:
-        Number(data.get("tp")) || 0,
-
-      open_time:
-        data.get("open_time") || "",
-
-      close_price:
-        data.get("close_price") || "",
-
-      close_time:
-        data.get("status") === "CLOSED"
-          ? new Date().toISOString()
-          : "",
-
-      profit:
-        Number(data.get("profit")) || 0,
-
-      swap: 0,
-
-      commission: 0,
-
-      status:
-        data.get("status") || "OPEN",
-
-      notes:
-        String(data.get("notes") || "").trim(),
-
-      created_at:
-        new Date().toISOString(),
-
-      updated_at:
-        new Date().toISOString()
-    };
-
-    if (!trade.symbol) {
-      alert("Symbol wajib diisi.");
-      return;
-    }
-
-    if (trade.volume <= 0) {
-      alert("Volume harus lebih besar dari 0.");
-      return;
-    }
-
-    if (trade.entry_price <= 0) {
-      alert("Entry price wajib diisi.");
-      return;
-    }
-
-    const trades = getTrades();
-
-    trades.unshift(trade);
-
-    saveTrades(trades);
-
-    closeTradeModal();
-
-    renderApplication();
-
-    showPage("journal");
-
-    alert("Trade berhasil disimpan.");
+    totalPL.style.color =
+      pl > 0
+        ? "var(--green)"
+        : pl < 0
+          ? "var(--red)"
+          : "var(--text)";
   }
 
-  /* =======================================================
-     NEW TRADE BUTTONS
-  ======================================================= */
 
-  function bindNewTradeButtons() {
-    document
-      .querySelectorAll(".primary-button")
-      .forEach((button) => {
+  if (winRate) {
 
-        const text =
-          button.textContent
-            .trim()
-            .toLowerCase();
-
-        if (
-          text.includes("new trade") &&
-          !button.dataset.tradeBound
-        ) {
-          button.dataset.tradeBound = "true";
-
-          button.addEventListener(
-            "click",
-            openTradeModal
-          );
-        }
-      });
-
-    document
-      .querySelectorAll(".secondary-button")
-      .forEach((button) => {
-
-        const text =
-          button.textContent
-            .trim()
-            .toLowerCase();
-
-        if (
-          text.includes("first trade") &&
-          !button.dataset.tradeBound
-        ) {
-          button.dataset.tradeBound = "true";
-
-          button.addEventListener(
-            "click",
-            openTradeModal
-          );
-        }
-      });
+    winRate.textContent =
+      `${wins}%`;
   }
 
-  /* =======================================================
-     DASHBOARD
-  ======================================================= */
 
-  function updateDashboard() {
-    const trades = getTrades();
+  if (tradeCount) {
 
-    const closedTrades =
+    tradeCount.textContent =
+      trades.length;
+  }
+
+
+  if (plMeta) {
+
+    const closed =
       trades.filter(
-        (trade) =>
-          trade.status === "CLOSED"
-      );
-
-    const totalPL =
-      closedTrades.reduce(
-        (sum, trade) =>
-          sum + calculateTradePL(trade),
-        0
-      );
-
-    const wins =
-      closedTrades.filter(
-        (trade) =>
-          calculateTradePL(trade) > 0
+        trade => trade.status === "CLOSED"
       ).length;
 
-    const winRate =
-      closedTrades.length
-        ? (wins / closedTrades.length) * 100
-        : 0;
-
-    const stats =
-      document.querySelectorAll(
-        ".stat-card"
-      );
-
-    if (stats.length >= 4) {
-
-      const values =
-        stats[0].querySelector(
-          ".stat-value"
-        );
-
-      const pl =
-        stats[1].querySelector(
-          ".stat-value"
-        );
-
-      const rate =
-        stats[2].querySelector(
-          ".stat-value"
-        );
-
-      const count =
-        stats[3].querySelector(
-          ".stat-value"
-        );
-
-      if (values) {
-        values.textContent =
-          formatMoney(totalPL);
-      }
-
-      if (pl) {
-        pl.textContent =
-          formatMoney(totalPL);
-      }
-
-      if (rate) {
-        rate.textContent =
-          `${formatNumber(winRate)}%`;
-      }
-
-      if (count) {
-        count.textContent =
-          trades.length;
-      }
-    }
-
-    renderRecentTrades();
+    plMeta.textContent =
+      closed
+        ? `${closed} closed trade${closed > 1 ? "s" : ""}`
+        : "No closed trades";
   }
 
-  /* =======================================================
-     RECENT TRADES
-  ======================================================= */
 
-  function renderRecentTrades() {
-    const panel =
-      document.querySelector(
-        ".trades-panel"
-      );
+  renderRecentTrades();
 
-    if (!panel) return;
+  renderJournal();
 
-    const trades = getTrades();
+}
 
-    const empty =
-      panel.querySelector(
-        ".empty-trades"
-      );
 
-    if (!trades.length) {
+// =========================================================
+// RECENT TRADES
+// =========================================================
 
-      if (empty) {
-        empty.style.display = "flex";
-      }
+function renderRecentTrades() {
 
-      return;
-    }
+  const container =
+    document.getElementById(
+      "recentTradesList"
+    );
 
-    if (empty) {
-      empty.style.display = "none";
-    }
-
-    let container =
-      panel.querySelector(
-        ".recent-trades-list"
-      );
-
-    if (!container) {
-
-      container =
-        document.createElement("div");
-
-      container.className =
-        "recent-trades-list";
-
-      panel.appendChild(container);
-    }
-
-    container.innerHTML =
-      trades
-        .slice(0, 5)
-        .map((trade) => {
-
-          const pl =
-            calculateTradePL(trade);
-
-          const plClass =
-            pl > 0
-              ? "trade-positive"
-              : pl < 0
-                ? "trade-negative"
-                : "trade-neutral";
-
-          return `
-            <div class="recent-trade-row">
-
-              <div class="recent-symbol">
-                <strong>
-                  ${escapeHTML(trade.symbol)}
-                </strong>
-
-                <span>
-                  ${escapeHTML(trade.side)}
-                  · ${escapeHTML(trade.status)}
-                </span>
-              </div>
-
-              <div class="recent-trade-price">
-                <strong>
-                  ${formatNumber(
-                    trade.entry_price,
-                    2
-                  )}
-                </strong>
-
-                <span
-                  class="${plClass}"
-                >
-                  ${pl >= 0 ? "+" : ""}
-                  ${formatMoney(pl)}
-                </span>
-              </div>
-
-            </div>
-          `;
-        })
-        .join("");
+  if (!container) {
+    return;
   }
 
-  /* =======================================================
-     JOURNAL
-  ======================================================= */
 
-  function renderJournal() {
-    const journal =
-      document.getElementById(
-        "journal"
-      );
+  if (!trades.length) {
 
-    if (!journal) return;
+    container.innerHTML = `
 
-    const trades =
-      getTrades();
+      <div class="empty">
 
-    const panel =
-      journal.querySelector(
-        ".coming-soon-panel"
-      );
-
-    if (!panel) return;
-
-    if (!trades.length) {
-      return;
-    }
-
-    panel.innerHTML = `
-      <div class="journal-toolbar">
-
-        <div>
-          <span class="panel-eyebrow">
-            TRADE LOG
-          </span>
-
-          <h2>
-            ${trades.length} Trade${trades.length > 1 ? "s" : ""}
-          </h2>
+        <div class="empty-icon">
+          ◇
         </div>
 
+        <strong>
+          No trades yet
+        </strong>
+
+        <span>
+          Add your first trade to start tracking.
+        </span>
+
         <button
-          class="primary-button"
-          id="journal-new-trade"
+          class="secondary"
+          id="emptyNewTradeButton"
+          type="button"
         >
-          + New Trade
+          Add first trade
         </button>
 
       </div>
 
-      <div class="journal-table-wrap">
-
-        <table class="journal-table">
-
-          <thead>
-            <tr>
-              <th>Symbol</th>
-              <th>Side</th>
-              <th>Entry</th>
-              <th>SL</th>
-              <th>TP</th>
-              <th>Status</th>
-              <th>P/L</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            ${trades
-              .map((trade) => {
-
-                const pl =
-                  calculateTradePL(
-                    trade
-                  );
-
-                const plClass =
-                  pl > 0
-                    ? "trade-positive"
-                    : pl < 0
-                      ? "trade-negative"
-                      : "trade-neutral";
-
-                return `
-                  <tr>
-
-                    <td>
-                      <strong>
-                        ${escapeHTML(
-                          trade.symbol
-                        )}
-                      </strong>
-                    </td>
-
-                    <td>
-                      <span class="side-badge ${trade.side === "BUY" ? "buy" : "sell"}">
-                        ${escapeHTML(
-                          trade.side
-                        )}
-                      </span>
-                    </td>
-
-                    <td>
-                      ${formatNumber(
-                        trade.entry_price
-                      )}
-                    </td>
-
-                    <td>
-                      ${trade.sl
-                        ? formatNumber(trade.sl)
-                        : "—"}
-                    </td>
-
-                    <td>
-                      ${trade.tp
-                        ? formatNumber(trade.tp)
-                        : "—"}
-                    </td>
-
-                    <td>
-                      ${escapeHTML(
-                        trade.status
-                      )}
-                    </td>
-
-                    <td
-                      class="${plClass}"
-                    >
-                      ${pl >= 0 ? "+" : ""}
-                      ${formatMoney(pl)}
-                    </td>
-
-                    <td>
-                      <button
-                        class="delete-trade"
-                        data-id="${trade.id}"
-                      >
-                        Delete
-                      </button>
-                    </td>
-
-                  </tr>
-                `;
-              })
-              .join("")}
-
-          </tbody>
-
-        </table>
-
-      </div>
     `;
 
-    document
-      .getElementById(
-        "journal-new-trade"
-      )
-      ?.addEventListener(
+
+    const button =
+      document.getElementById(
+        "emptyNewTradeButton"
+      );
+
+    if (button) {
+      button.addEventListener(
         "click",
         openTradeModal
       );
+    }
 
-    journal
-      .querySelectorAll(
-        ".delete-trade"
+    return;
+  }
+
+
+  const recent =
+    [...trades]
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt) -
+          new Date(a.createdAt)
       )
-      .forEach((button) => {
+      .slice(0, 5);
 
-        button.addEventListener(
-          "click",
-          () => {
 
-            const id =
-              button.dataset.id;
+  container.innerHTML = `
 
-            deleteTrade(id);
-          }
-        );
-      });
+    <div class="trade-table-wrapper">
+
+      <table class="trade-table">
+
+        <thead>
+
+          <tr>
+            <th>Symbol</th>
+            <th>Side</th>
+            <th>Volume</th>
+            <th>Status</th>
+            <th>P/L</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${recent.map(trade => {
+
+            const profit =
+              Number(trade.profit) || 0;
+
+            const profitClass =
+              profit > 0
+                ? "trade-positive"
+                : profit < 0
+                  ? "trade-negative"
+                  : "";
+
+            const sideClass =
+              trade.side === "BUY"
+                ? "side-buy"
+                : "side-sell";
+
+
+            return `
+
+              <tr>
+
+                <td>
+                  <strong>
+                    ${escapeHTML(trade.symbol)}
+                  </strong>
+                </td>
+
+                <td class="${sideClass}">
+                  ${escapeHTML(trade.side)}
+                </td>
+
+                <td>
+                  ${escapeHTML(trade.volume)}
+                </td>
+
+                <td>
+                  ${escapeHTML(trade.status)}
+                </td>
+
+                <td class="${profitClass}">
+                  ${money(profit)}
+                </td>
+
+              </tr>
+
+            `;
+
+          }).join("")}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+}
+
+
+// =========================================================
+// JOURNAL
+// =========================================================
+
+function renderJournal() {
+
+  const container =
+    document.getElementById(
+      "journalTableContainer"
+    );
+
+  if (!container) {
+    return;
   }
 
-  /* =======================================================
-     DELETE TRADE
-  ======================================================= */
 
-  function deleteTrade(id) {
-    const confirmed =
-      confirm(
-        "Delete trade ini?"
-      );
+  if (!trades.length) {
 
-    if (!confirmed) return;
+    container.innerHTML = `
 
-    const trades =
-      getTrades().filter(
-        (trade) =>
-          String(trade.id) !==
-          String(id)
-      );
+      <div class="empty">
 
-    saveTrades(trades);
+        <div class="empty-icon">
+          ✦
+        </div>
 
-    renderApplication();
+        <strong>
+          Your journal is empty
+        </strong>
+
+        <span>
+          Your trades will appear here.
+        </span>
+
+      </div>
+
+    `;
+
+    return;
   }
 
-  /* =======================================================
-     VIEW ALL
-  ======================================================= */
+
+  const sorted =
+    [...trades].sort(
+      (a, b) =>
+        new Date(b.createdAt) -
+        new Date(a.createdAt)
+    );
+
+
+  container.innerHTML = `
+
+    <div class="trade-table-wrapper">
+
+      <table class="trade-table">
+
+        <thead>
+
+          <tr>
+            <th>Symbol</th>
+            <th>Side</th>
+            <th>Entry</th>
+            <th>Close</th>
+            <th>Status</th>
+            <th>P/L</th>
+            <th>Action</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${sorted.map(trade => {
+
+            const profit =
+              Number(trade.profit) || 0;
+
+            const profitClass =
+              profit > 0
+                ? "trade-positive"
+                : profit < 0
+                  ? "trade-negative"
+                  : "";
+
+            const sideClass =
+              trade.side === "BUY"
+                ? "side-buy"
+                : "side-sell";
+
+
+            return `
+
+              <tr>
+
+                <td>
+                  <strong>
+                    ${escapeHTML(trade.symbol)}
+                  </strong>
+                </td>
+
+                <td class="${sideClass}">
+                  ${escapeHTML(trade.side)}
+                </td>
+
+                <td>
+                  ${escapeHTML(trade.entry)}
+                </td>
+
+                <td>
+                  ${escapeHTML(trade.close || "-")}
+                </td>
+
+                <td>
+                  ${escapeHTML(trade.status)}
+                </td>
+
+                <td class="${profitClass}">
+                  ${money(profit)}
+                </td>
+
+                <td>
+
+                  <button
+                    class="delete-trade"
+                    data-id="${escapeHTML(trade.id)}"
+                    type="button"
+                  >
+                    Delete
+                  </button>
+
+                </td>
+
+              </tr>
+
+            `;
+
+          }).join("")}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
 
   document
-    .querySelectorAll(".text-button")
-    .forEach((button) => {
+    .querySelectorAll(".delete-trade")
+    .forEach(button => {
 
-      const text =
-        button.textContent
-          .trim()
-          .toLowerCase();
-
-      if (
-        text.includes("view all")
-      ) {
-        button.addEventListener(
-          "click",
-          () => showPage("journal")
-        );
-      }
-    });
-
-  /* =======================================================
-     WATCHLIST
-  ======================================================= */
-
-  document
-    .querySelectorAll(".watch-item")
-    .forEach((item) => {
-
-      item.addEventListener(
+      button.addEventListener(
         "click",
         () => {
 
-          const symbol =
-            item.querySelector(
-              ".asset strong"
-            )?.textContent ||
-            "Asset";
-
-          showPage("analysis");
-
-          console.log(
-            `Selected market: ${symbol}`
+          deleteTrade(
+            button.dataset.id
           );
+
         }
       );
+
     });
 
-  /* =======================================================
-     PERIOD SELECTOR
-  ======================================================= */
+}
 
-  const periodButton =
-    document.querySelector(
-      ".period-button"
+
+// =========================================================
+// DELETE TRADE
+// =========================================================
+
+function deleteTrade(id) {
+
+  const trade =
+    trades.find(
+      item => item.id === id
     );
 
-  if (periodButton) {
-
-    periodButton.addEventListener(
-      "click",
-      () => {
-
-        const periods = [
-          "7 Days",
-          "30 Days",
-          "90 Days",
-          "1 Year"
-        ];
-
-        const current =
-          periodButton.textContent
-            .replace(" ▾", "")
-            .trim();
-
-        const index =
-          periods.indexOf(current);
-
-        const next =
-          index === -1
-            ? 0
-            : (index + 1) %
-              periods.length;
-
-        periodButton.textContent =
-          `${periods[next]} ▾`;
-      }
-    );
+  if (!trade) {
+    return;
   }
 
-  /* =======================================================
-     NOTIFICATION
-  ======================================================= */
 
-  const notificationButton =
-    document.querySelector(
-      ".icon-button"
+  const confirmed =
+    window.confirm(
+      `Delete ${trade.symbol} trade?`
     );
 
-  if (notificationButton) {
 
-    notificationButton.addEventListener(
-      "click",
-      () => {
-
-        alert(
-          "Notifications\n\n" +
-          "No new notifications."
-        );
-      }
-    );
+  if (!confirmed) {
+    return;
   }
 
-  /* =======================================================
-     PROFILE
-  ======================================================= */
 
-  const profileButton =
-    document.querySelector(
-      ".profile-button"
+  trades =
+    trades.filter(
+      item => item.id !== id
     );
 
-  if (profileButton) {
 
-    profileButton.addEventListener(
-      "click",
-      () => {
+  saveTrades();
 
-        showPage("settings");
-      }
+  updateDashboard();
+
+}
+
+
+// =========================================================
+// NEW TRADE MODAL
+// =========================================================
+
+function openTradeModal() {
+
+  closeTradeModal();
+
+
+  const backdrop =
+    document.createElement("div");
+
+  backdrop.className =
+    "trade-modal-backdrop";
+
+  backdrop.id =
+    "tradeModal";
+
+
+  backdrop.innerHTML = `
+
+    <div
+      class="trade-modal"
+      role="dialog"
+      aria-modal="true"
+    >
+
+      <div class="trade-modal-header">
+
+        <div>
+
+          <span class="eyebrow">
+            TRADE RECORD
+          </span>
+
+          <h2>
+            New Trade
+          </h2>
+
+        </div>
+
+        <button
+          class="modal-close"
+          id="closeTradeModal"
+          type="button"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <form id="tradeForm">
+
+
+        <div class="form-grid">
+
+
+          <label>
+
+            <span>Symbol</span>
+
+            <input
+              name="symbol"
+              type="text"
+              value="XAUUSD"
+              placeholder="XAUUSD"
+              required
+            >
+
+          </label>
+
+
+          <label>
+
+            <span>Side</span>
+
+            <select name="side">
+
+              <option value="BUY">
+                BUY
+              </option>
+
+              <option value="SELL">
+                SELL
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label>
+
+            <span>Volume</span>
+
+            <input
+              name="volume"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="0.01"
+              required
+            >
+
+          </label>
+
+
+          <label>
+
+            <span>Status</span>
+
+            <select name="status">
+
+              <option value="OPEN">
+                OPEN
+              </option>
+
+              <option value="CLOSED">
+                CLOSED
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label>
+
+            <span>Entry Price</span>
+
+            <input
+              name="entry"
+              type="number"
+              step="any"
+              placeholder="3500.00"
+              required
+            >
+
+          </label>
+
+
+          <label>
+
+            <span>Close Price</span>
+
+            <input
+              name="close"
+              type="number"
+              step="any"
+              placeholder="3520.00"
+            >
+
+          </label>
+
+
+          <label>
+
+            <span>Stop Loss</span>
+
+            <input
+              name="sl"
+              type="number"
+              step="any"
+              placeholder="3490.00"
+            >
+
+          </label>
+
+
+          <label>
+
+            <span>Take Profit</span>
+
+            <input
+              name="tp"
+              type="number"
+              step="any"
+              placeholder="3520.00"
+            >
+
+          </label>
+
+
+          <label>
+
+            <span>P/L</span>
+
+            <input
+              name="profit"
+              type="number"
+              step="any"
+              value="0"
+              placeholder="0"
+            >
+
+          </label>
+
+
+          <label>
+
+            <span>Open Time</span>
+
+            <input
+              name="openTime"
+              type="datetime-local"
+            >
+
+          </label>
+
+
+          <label class="full">
+
+            <span>Notes</span>
+
+            <textarea
+              name="notes"
+              rows="3"
+              placeholder="Trade setup, psychology, execution..."
+            ></textarea>
+
+          </label>
+
+
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="secondary"
+            id="cancelTrade"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            class="primary"
+          >
+            Save Trade
+          </button>
+
+        </div>
+
+
+      </form>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(
+    backdrop
+  );
+
+
+  const form =
+    document.getElementById(
+      "tradeForm"
     );
-  }
 
-  /* =======================================================
-     KEYBOARD SHORTCUTS
-  ======================================================= */
 
-  document.addEventListener(
-    "keydown",
-    (event) => {
+  const closeButton =
+    document.getElementById(
+      "closeTradeModal"
+    );
 
-      if (
-        event.target.tagName === "INPUT" ||
-        event.target.tagName === "TEXTAREA" ||
-        event.target.tagName === "SELECT"
-      ) {
-        return;
-      }
 
-      const pages = {
-        "1": "dashboard",
-        "2": "analysis",
-        "3": "journal",
-        "4": "cashflow",
-        "5": "settings"
-      };
+  const cancelButton =
+    document.getElementById(
+      "cancelTrade"
+    );
 
-      if (pages[event.key]) {
-        showPage(
-          pages[event.key]
-        );
-      }
 
-      if (
-        event.key === "Escape"
-      ) {
+  closeButton.addEventListener(
+    "click",
+    closeTradeModal
+  );
+
+
+  cancelButton.addEventListener(
+    "click",
+    closeTradeModal
+  );
+
+
+  backdrop.addEventListener(
+    "click",
+    event => {
+
+      if (event.target === backdrop) {
         closeTradeModal();
       }
+
     }
   );
 
-  /* =======================================================
-     RENDER APPLICATION
-  ======================================================= */
 
-  function renderApplication() {
-    updateDashboard();
-    renderJournal();
-    bindNewTradeButtons();
+  form.addEventListener(
+    "submit",
+    handleTradeSubmit
+  );
+
+
+  document.body.style.overflow =
+    "hidden";
+}
+
+
+function closeTradeModal() {
+
+  const modal =
+    document.getElementById(
+      "tradeModal"
+    );
+
+  if (modal) {
+    modal.remove();
   }
 
-  renderApplication();
+  document.body.style.overflow =
+    "";
+}
 
-  /* =======================================================
-     CONSOLE
-  ======================================================= */
 
-  console.log(
-    "%cMAETRADE",
-    "font-size:20px;font-weight:bold;color:#91a8ff;"
+// =========================================================
+// SAVE TRADE
+// =========================================================
+
+function handleTradeSubmit(event) {
+
+  event.preventDefault();
+
+
+  const form =
+    event.currentTarget;
+
+  const data =
+    new FormData(form);
+
+
+  const status =
+    data.get("status") ||
+    "OPEN";
+
+
+  const trade = {
+
+    id: generateId(),
+
+    symbol:
+      String(data.get("symbol") || "XAUUSD")
+        .trim()
+        .toUpperCase(),
+
+    side:
+      String(data.get("side") || "BUY"),
+
+    volume:
+      Number(data.get("volume")) || 0,
+
+    status:
+      status,
+
+    entry:
+      Number(data.get("entry")) || 0,
+
+    close:
+      Number(data.get("close")) || 0,
+
+    sl:
+      Number(data.get("sl")) || 0,
+
+    tp:
+      Number(data.get("tp")) || 0,
+
+    profit:
+      Number(data.get("profit")) || 0,
+
+    openTime:
+      String(data.get("openTime") || ""),
+
+    notes:
+      String(data.get("notes") || "").trim(),
+
+    createdAt:
+      new Date().toISOString()
+
+  };
+
+
+  if (!trade.symbol) {
+
+    alert("Symbol wajib diisi.");
+
+    return;
+  }
+
+
+  if (trade.volume <= 0) {
+
+    alert("Volume harus lebih besar dari 0.");
+
+    return;
+  }
+
+
+  if (trade.entry <= 0) {
+
+    alert("Entry price wajib diisi.");
+
+    return;
+  }
+
+
+  trades.push(trade);
+
+  saveTrades();
+
+  closeTradeModal();
+
+  updateDashboard();
+
+  alert(
+    `${trade.symbol} ${trade.side} berhasil disimpan.`
   );
 
-  console.log(
-    "%cTrading workspace initialized.",
-    "color:#8c96aa;"
+}
+
+
+// =========================================================
+// BUTTONS
+// =========================================================
+
+const newTradeButton =
+  document.getElementById(
+    "newTradeButton"
   );
 
-});
+if (newTradeButton) {
+
+  newTradeButton.addEventListener(
+    "click",
+    openTradeModal
+  );
+
+}
+
+
+const emptyNewTradeButton =
+  document.getElementById(
+    "emptyNewTradeButton"
+  );
+
+if (emptyNewTradeButton) {
+
+  emptyNewTradeButton.addEventListener(
+    "click",
+    openTradeModal
+  );
+
+}
+
+
+const viewAllTrades =
+  document.getElementById(
+    "viewAllTrades"
+  );
+
+if (viewAllTrades) {
+
+  viewAllTrades.addEventListener(
+    "click",
+    () => {
+
+      showPage("journal");
+
+    }
+  );
+
+}
+
+
+const newJournalButton =
+  document.getElementById(
+    "newJournalButton"
+  );
+
+if (newJournalButton) {
+
+  newJournalButton.addEventListener(
+    "click",
+    openTradeModal
+  );
+
+}
+
+
+const journalTableContainer =
+  document.getElementById(
+    "journalTableContainer"
+  );
+
+
+// =========================================================
+// WATCHLIST
+// =========================================================
+
+document
+  .querySelectorAll(".watch")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        const symbol =
+          button.dataset.symbol;
+
+        const analysisSymbol =
+          document.getElementById(
+            "analysisSymbol"
+          );
+
+        if (analysisSymbol) {
+          analysisSymbol.textContent =
+            symbol;
+        }
+
+        showPage("analysis");
+
+      }
+    );
+
+  });
+
+
+// =========================================================
+// CLEAR DATA
+// =========================================================
+
+const clearTradesButton =
+  document.getElementById(
+    "clearTradesButton"
+  );
+
+if (clearTradesButton) {
+
+  clearTradesButton.addEventListener(
+    "click",
+    () => {
+
+      if (!trades.length) {
+
+        alert("Belum ada trade.");
+
+        return;
+      }
+
+
+      const confirmed =
+        window.confirm(
+          "Hapus SEMUA data trade?"
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      trades = [];
+
+      saveTrades();
+
+      updateDashboard();
+
+      alert(
+        "Semua data trade sudah dihapus."
+      );
+
+    }
+  );
+
+}
+
+
+// =========================================================
+// OTHER BUTTONS
+// =========================================================
+
+const addTransactionButton =
+  document.getElementById(
+    "addTransactionButton"
+  );
+
+if (addTransactionButton) {
+
+  addTransactionButton.addEventListener(
+    "click",
+    () => {
+
+      alert(
+        "Cashflow module akan ditambahkan setelah trade tracker stabil."
+      );
+
+    }
+  );
+
+}
+
+
+const profileButton =
+  document.getElementById(
+    "profileButton"
+  );
+
+if (profileButton) {
+
+  profileButton.addEventListener(
+    "click",
+    () => {
+
+      showPage("settings");
+
+    }
+  );
+
+}
+
+
+// =========================================================
+// KEYBOARD
+// =========================================================
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key === "Escape"
+    ) {
+
+      closeTradeModal();
+
+    }
+
+
+    if (
+      event.ctrlKey &&
+      event.key.toLowerCase() === "n"
+    ) {
+
+      event.preventDefault();
+
+      openTradeModal();
+
+    }
+
+  }
+);
+
+
+// =========================================================
+// INIT
+// =========================================================
+
+loadTrades();
+
+updateDashboard();
+
+console.log(
+  "MAETRADE initialized.",
+  trades.length,
+  "trades loaded."
+);
