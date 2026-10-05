@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0c1017" />
+  <meta name="description" content="MAETRADE — Personal Trading Operating System" />
+  <title>MAETRADE — Trading Command Center</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M7 23.5 12.7 17l4.2 4.1L25 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22.5 9H25v2.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">MAETRADE</div>
+          <div class="brand-subtitle">Trading OS</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Workspace</div>
+        <button class="nav-item active" data-route="dashboard">
+          <span class="nav-icon">⌂</span><span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-route="technical">
+          <span class="nav-icon">⌁</span><span>Technical Analysis</span>
+        </button>
+        <button class="nav-item" data-route="journal">
+          <span class="nav-icon">✎</span><span>Trading Journal</span>
+        </button>
+        <button class="nav-item" data-route="history">
+          <span class="nav-icon">↕</span><span>Trade History</span>
+        </button>
+        <button class="nav-item" data-route="cashflow">
+          <span class="nav-icon">◫</span><span>Cashflow</span>
+        </button>
+        <button class="nav-item" data-route="reports">
+          <span class="nav-icon">◴</span><span>Reports</span>
+        </button>
+      </div>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="account-card">
+        <div class="account-card-top">
+          <span class="status-dot"></span>
+          <span>Workspace local</span>
+        </div>
+        <div class="account-balance" id="sideBalance">$10,000.00</div>
+        <div class="account-meta">Demo account · USD</div>
+      </div>
+
+      <div class="nav-section bottom-nav-section">
+        <div class="nav-label">System</div>
+        <button class="nav-item" data-route="settings">
+          <span class="nav-icon">⚙</span><span>Settings</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="mobile-backdrop" id="mobileBackdrop"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn mobile-menu" id="mobileMenuBtn" aria-label="Open navigation">☰</button>
+        <div class="breadcrumbs">
+          <span>MAETRADE</span>
+          <span class="crumb-separator">/</span>
+          <strong id="pageTitle">Dashboard</strong>
+        </div>
+        <div class="topbar-actions">
+          <label class="search-box">
+            <span>⌕</span>
+            <input id="globalSearch" type="search" placeholder="Search trades, symbols..." />
+          </label>
+          <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">◐</button>
+          <button class="icon-btn" id="notifyBtn" title="Notifications" aria-label="Notifications">◌</button>
+          <button class="profile-chip" id="profileBtn">
+            <span class="avatar">DM</span>
+            <span class="profile-copy">
+              <strong>D Mae</strong>
+              <small>Trader</small>
+            </span>
+            <span>⌄</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="route" data-page="dashboard">
+          <div class="hero-row">
+            <div>
+              <div class="eyebrow">Trading command center</div>
+              <h1>Stay deliberate. Trade with data.</h1>
+              <p class="muted">Track execution, review psychology, and understand the numbers behind your edge.</p>
+            </div>
+            <button class="btn btn-primary btn-lg" id="newTradeBtn">＋ New Trade</button>
+          </div>
+
+          <div class="kpi-grid">
+            <article class="kpi-card">
+              <div class="kpi-head"><span>Net P&amp;L</span><span class="metric-icon">↗</span></div>
+              <div class="kpi-value" id="kpiNetPnl">$0.00</div>
+              <div class="kpi-foot" id="kpiNetPnlFoot">No closed trades yet</div>
+            </article>
+            <article class="kpi-card">
+              <div class="kpi-head"><span>Win Rate</span><span class="metric-icon">%</span></div>
+              <div class="kpi-value" id="kpiWinRate">0.0%</div>
+              <div class="kpi-foot" id="kpiWinRateFoot">0 wins / 0 closed</div>
+            </article>
+            <article class="kpi-card">
+              <div class="kpi-head"><span>Profit Factor</span><span class="metric-icon">PF</span></div>
+              <div class="kpi-value" id="kpiProfitFactor">—</div>
+              <div class="kpi-foot">Gross profit / gross loss</div>
+            </article>
+            <article class="kpi-card">
+              <div class="kpi-head"><span>Total Trades</span><span class="metric-icon">#</span></div>
+              <div class="kpi-value" id="kpiTotalTrades">0</div>
+              <div class="kpi-foot" id="kpiTotalTradesFoot">Open 0 · Closed 0</div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel chart-panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Equity curve</h2>
+                  <p class="muted">Realized P&amp;L from stored closed trades.</p>
+                </div>
+                <select class="select" id="equityWindow">
+                  <option value="30">30 days</option>
+                  <option value="90">90 days</option>
+                  <option value="365">1 year</option>
+                  <option value="all">All time</option>
+                </select>
+              </div>
+              <div class="chart-wrap">
+                <svg id="equityChart" viewBox="0 0 800 300" preserveAspectRatio="none" role="img" aria-label="Equity curve"></svg>
+                <div class="chart-empty" id="equityEmpty">
+                  <strong>No closed trade data yet.</strong>
+                  <span>Close a trade to see your equity curve.</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel performance-panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Performance</h2>
+                  <p class="muted">Core risk and reward stats.</p>
+                </div>
+              </div>
+              <div class="stat-list">
+                <div><span>Average Win</span><strong id="statAvgWin">$0.00</strong></div>
+                <div><span>Average Loss</span><strong id="statAvgLoss">$0.00</strong></div>
+                <div><span>Expectancy</span><strong id="statExpectancy">$0.00</strong></div>
+                <div><span>Average R</span><strong id="statAvgR">0.00R</strong></div>
+                <div><span>Max Drawdown</span><strong id="statDrawdown">$0.00</strong></div>
+              </div>
+              <div class="mini-bar" aria-label="Wins and losses">
+                <span id="winBar" style="width:0%"></span>
+                <span id="lossBar" style="width:0%"></span>
+              </div>
+              <div class="bar-legend"><span><i class="dot win"></i> Wins <b id="winsCount">0</b></span><span><i class="dot loss"></i> Losses <b id="lossesCount">0</b></span></div>
+            </article>
+          </div>
+
+          <div class="section-row">
+            <div class="section-title">
+              <h2>Recent trades</h2>
+              <button class="text-btn" data-route-jump="history">View all →</button>
+            </div>
+            <div class="table-shell">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Symbol</th><th>Direction</th><th>Entry</th><th>Exit</th><th>P&amp;L</th><th>Status</th><th></th>
+                  </tr>
+                </thead>
+                <tbody id="recentTradesBody"></tbody>
+              </table>
+              <div class="table-empty" id="recentEmpty">No trades yet. Your trading history starts with your next setup.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="route hidden" data-page="technical">
+          <div class="page-heading"><div><div class="eyebrow">Pre-trade workspace</div><h1>Technical Analysis</h1><p class="muted">Build the thesis before execution, then carry the context into your trade record.</p></div><button class="btn btn-primary" id="analysisToTradeBtn">Use in New Trade →</button></div>
+          <div class="analysis-grid">
+            <article class="panel">
+              <div class="panel-head"><h2>Market thesis</h2><span class="badge neutral">Draft</span></div>
+              <div class="form-grid">
+                <label>Symbol<input id="taSymbol" placeholder="XAUUSD" /></label>
+                <label>Timeframe<select id="taTimeframe"><option>15m</option><option>1H</option><option>4H</option><option>Daily</option></select></label>
+                <label>Bias<select id="taBias"><option>Neutral</option><option>Bullish</option><option>Bearish</option></select></label>
+                <label>Session<select id="taSession"><option>London</option><option>New York</option><option>Asia</option><option>Overlap</option></select></label>
+              </div>
+              <label class="full">Setup<textarea id="taSetup" rows="4" placeholder="Describe BOS, CHoCH, FVG, liquidity, confluence, invalidation..."></textarea></label>
+              <label class="full">Notes<textarea id="taNotes" rows="6" placeholder="Write the thesis and what would invalidate it."></textarea></label>
+              <div class="panel-actions"><button class="btn" id="saveAnalysisBtn">Save analysis</button><button class="btn btn-primary" id="analysisToTradeBtn2">Continue to trade</button></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><h2>Process checklist</h2></div>
+              <div class="checklist">
+                <label><input type="checkbox"> Higher timeframe bias identified</label>
+                <label><input type="checkbox"> Liquidity / structure mapped</label>
+                <label><input type="checkbox"> Entry model defined</label>
+                <label><input type="checkbox"> Stop invalidation is clear</label>
+                <label><input type="checkbox"> Target has logical liquidity</label>
+                <label><input type="checkbox"> Risk is acceptable</label>
+              </div>
+              <div class="callout"><strong>Rule:</strong> No setup, no trade. Technical Analysis is a workspace—not a prediction machine.</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="route hidden" data-page="journal">
+          <div class="page-heading"><div><div class="eyebrow">Review system</div><h1>Trading Journal</h1><p class="muted">Turn every trade into structured feedback.</p></div><button class="btn btn-primary" id="journalQuickBtn">＋ Journal Entry</button></div>
+          <div class="journal-grid" id="journalGrid"></div>
+          <div class="table-empty hidden" id="journalEmpty">No journal-ready trades yet. Add a trade, then document what happened.</div>
+        </section>
+
+        <section class="route hidden" data-page="history">
+          <div class="page-heading"><div><div class="eyebrow">Execution records</div><h1>Trade History</h1><p class="muted">One source of truth for every executed idea.</p></div><button class="btn btn-primary" id="historyNewTradeBtn">＋ New Trade</button></div>
+          <div class="toolbar">
+            <div class="toolbar-group">
+              <input class="field-inline" id="historySearch" placeholder="Search symbol, setup, strategy..." />
+              <select class="select" id="historyStatus"><option value="all">All status</option><option value="OPEN">Open</option><option value="CLOSED">Closed</option></select>
+              <select class="select" id="historyDirection"><option value="all">All directions</option><option value="BUY">Buy</option><option value="SELL">Sell</option></select>
+            </div>
+          </div>
+          <div class="table-shell">
+            <table class="data-table">
+              <thead><tr><th>Date</th><th>Symbol</th><th>Direction</th><th>Entry</th><th>SL</th><th>TP</th><th>P&amp;L</th><th>Status</th><th></th></tr></thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+            <div class="table-empty hidden" id="historyEmpty">No trades match the current filters.</div>
+          </div>
+        </section>
+
+        <section class="route hidden" data-page="cashflow">
+          <div class="page-heading"><div><div class="eyebrow">Money management</div><h1>Cashflow</h1><p class="muted">Keep deposits, withdrawals, and trading performance analytically separate.</p></div><button class="btn btn-primary" id="cashflowAddBtn">＋ Add Cashflow</button></div>
+          <div class="kpi-grid">
+            <article class="kpi-card"><div class="kpi-head"><span>Initial Capital</span><span class="metric-icon">$</span></div><div class="kpi-value" id="cashInitial">$0.00</div><div class="kpi-foot">Starting point</div></article>
+            <article class="kpi-card"><div class="kpi-head"><span>Cash In</span><span class="metric-icon">↗</span></div><div class="kpi-value" id="cashIn">$0.00</div><div class="kpi-foot">Deposits / inflows</div></article>
+            <article class="kpi-card"><div class="kpi-head"><span>Cash Out</span><span class="metric-icon">↘</span></div><div class="kpi-value" id="cashOut">$0.00</div><div class="kpi-foot">Withdrawals / outflows</div></article>
+            <article class="kpi-card"><div class="kpi-head"><span>Net Cashflow</span><span class="metric-icon">Σ</span></div><div class="kpi-value" id="cashNet">$0.00</div><div class="kpi-foot">Cash in minus cash out</div></article>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><h2>Cashflow history</h2><p class="muted">Daily, monthly, and yearly views can be wired to the same ledger.</p></div><select class="select" id="cashWindow"><option>Monthly</option><option>Yearly</option><option>All time</option></select></div>
+            <div class="table-shell">
+              <table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Category</th><th>Description</th><th></th></tr></thead><tbody id="cashflowBody"></tbody></table>
+              <div class="table-empty hidden" id="cashflowEmpty">No cashflow records yet.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="route hidden" data-page="reports">
+          <div class="page-heading"><div><div class="eyebrow">Performance review</div><h1>Reports</h1><p class="muted">Structured snapshots for reviewing your process over time.</p></div><button class="btn" id="exportBtn">↥ Export JSON</button></div>
+          <div class="report-grid">
+            <button class="report-card" data-report="monthly"><span class="report-icon">◫</span><strong>Monthly Review</strong><small>P&amp;L, win rate, drawdown, best/worst trades.</small></button>
+            <button class="report-card" data-report="strategy"><span class="report-icon">◇</span><strong>Strategy Performance</strong><small>Compare actual outcomes by strategy.</small></button>
+            <button class="report-card" data-report="symbol"><span class="report-icon">◎</span><strong>Symbol Performance</strong><small>Find the instruments where your edge shows up.</small></button>
+            <button class="report-card" data-report="psychology"><span class="report-icon">◌</span><strong>Psychology Review</strong><small>Compare emotion and confidence against outcomes.</small></button>
+          </div>
+          <article class="panel report-output" id="reportOutput">
+            <div class="empty-illustration">▣</div>
+            <h2>Select a report</h2>
+            <p class="muted">The report engine uses the same stored trade data as Dashboard and Analytics.</p>
+          </article>
+        </section>
+
+        <section class="route hidden" data-page="settings">
+          <div class="page-heading"><div><div class="eyebrow">Workspace configuration</div><h1>Settings</h1><p class="muted">Configure account defaults and local data behavior.</p></div></div>
+          <div class="settings-grid">
+            <article class="panel">
+              <div class="panel-head"><h2>Trading account</h2></div>
+              <div class="form-grid">
+                <label>Account name<input id="settingAccountName" value="Demo Account"></label>
+                <label>Currency<select id="settingCurrency"><option>USD</option><option>IDR</option><option>EUR</option></select></label>
+                <label>Starting balance<input id="settingBalance" type="number" value="10000"></label>
+                <label>Risk per trade (%)<input id="settingRisk" type="number" value="1" step="0.1"></label>
+              </div>
+              <button class="btn btn-primary" id="saveSettingsBtn">Save settings</button>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><h2>Data management</h2></div>
+              <p class="muted">This foundation stores data in browser localStorage. It is intentionally easy to replace with your Workers + D1 backend later.</p>
+              <div class="danger-zone">
+                <div><strong>Reset demo data</strong><span>Deletes locally stored trades, journal notes, and cashflow.</span></div>
+                <button class="btn btn-danger" id="resetDataBtn">Reset</button>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <nav class="mobile-nav" id="mobileNav">
+      <button class="mobile-nav-item active" data-route="dashboard"><span>⌂</span><small>Home</small></button>
+      <button class="mobile-nav-item" data-route="technical"><span>⌁</span><small>Analysis</small></button>
+      <button class="mobile-nav-item newtrade-mobile" id="mobileNewTrade"><span>＋</span><small>Trade</small></button>
+      <button class="mobile-nav-item" data-route="journal"><span>✎</span><small>Journal</small></button>
+      <button class="mobile-nav-item" data-route="history"><span>↕</span><small>History</small></button>
+    </nav>
+  </div>
+
+  <div class="modal-backdrop hidden" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tradeModalTitle">
+      <div class="modal-head">
+        <div><div class="eyebrow">Execution record</div><h2 id="tradeModalTitle">New Trade</h2></div>
+        <button class="icon-btn" id="closeModalBtn" aria-label="Close">×</button>
+      </div>
+      <form id="tradeForm">
+        <input type="hidden" id="tradeId" />
+        <div class="stepper">
+          <button type="button" class="step active" data-step="1">1 <span>Trade</span></button>
+          <button type="button" class="step" data-step="2">2 <span>Risk</span></button>
+          <button type="button" class="step" data-step="3">3 <span>Context</span></button>
+          <button type="button" class="step" data-step="4">4 <span>Review</span></button>
+        </div>
+
+        <div class="trade-step active" data-step-panel="1">
+          <div class="form-grid">
+            <label>Symbol<input id="tradeSymbol" required placeholder="XAUUSD" autocomplete="off"></label>
+            <label>Direction<select id="tradeDirection" required><option value="BUY">BUY</option><option value="SELL">SELL</option></select></label>
+            <label>Volume<input id="tradeVolume" required type="number" min="0" step="0.01" placeholder="0.01"></label>
+            <label>Account<input id="tradeAccount" required value="Demo Account"></label>
+            <label>Entry Price<input id="tradeEntry" required type="number" step="any" placeholder="3500.00"></label>
+            <label>Entry Time<input id="tradeEntryTime" required type="datetime-local"></label>
+          </div>
+        </div>
+
+        <div class="trade-step" data-step-panel="2">
+          <div class="risk-preview">
+            <div><span>Planned risk</span><strong id="riskAmount">$0.00</strong></div>
+            <div><span>Reward potential</span><strong id="rewardAmount">$0.00</strong></div>
+            <div><span>Planned R:R</span><strong id="plannedRR">0.00</strong></div>
+          </div>
+          <div class="form-grid">
+            <label>Stop Loss<input id="tradeSL" required type="number" step="any" placeholder="3490.00"></label>
+            <label>Take Profit<input id="tradeTP" required type="number" step="any" placeholder="3520.00"></label>
+            <label>Exit Price<input id="tradeExit" type="number" step="any" placeholder="Leave blank while OPEN"></label>
+            <label>Exit Time<input id="tradeExitTime" type="datetime-local"></label>
+          </div>
+          <p class="form-hint">Close the trade by adding an exit price. R multiple uses the planned entry-to-SL risk.</p>
+        </div>
+
+        <div class="trade-step" data-step-panel="3">
+          <div class="form-grid">
+            <label>Strategy<input id="tradeStrategy" placeholder="SMC"></label>
+            <label>Timeframe<select id="tradeTimeframe"><option>15m</option><option>1H</option><option>4H</option><option>Daily</option></select></label>
+            <label>Market Bias<select id="tradeBias"><option>Neutral</option><option>Bullish</option><option>Bearish</option></select></label>
+            <label>Setup<input id="tradeSetup" placeholder="BOS + FVG"></label>
+            <label>Session<select id="tradeSession"><option>London</option><option>New York</option><option>Asia</option><option>Overlap</option></select></label>
+            <label>Emotion<select id="tradeEmotion"><option>Calm</option><option>Confident</option><option>Fearful</option><option>Greedy</option><option>FOMO</option><option>Frustrated</option></select></label>
+            <label>Confidence (1–5)<input id="tradeConfidence" type="number" min="1" max="5" value="3"></label>
+          </div>
+        </div>
+
+        <div class="trade-step" data-step-panel="4">
+          <div class="form-grid">
+            <label class="full">Entry Reason<textarea id="tradeReason" rows="4" placeholder="Why was this trade valid?"></textarea></label>
+            <label class="full">Notes<textarea id="tradeNotes" rows="4" placeholder="Execution notes, mistakes, lesson..."></textarea></label>
+          </div>
+          <div class="screenshot-drop" id="screenshotDrop">
+            <input id="tradeScreenshot" type="file" accept="image/*" hidden>
+            <div class="screenshot-icon">↥</div>
+            <strong>Trade screenshot</strong>
+            <span>Tap to attach an image. Stored locally in this frontend foundation.</span>
+            <button type="button" class="btn" id="screenshotBtn">Choose image</button>
+            <div class="screenshot-preview hidden" id="screenshotPreview"></div>
+          </div>
+        </div>
+
+        <div class="modal-foot">
+          <div class="modal-status" id="formStatus"></div>
+          <div class="modal-actions">
+            <button type="button" class="btn" id="prevStepBtn">Back</button>
+            <button type="button" class="btn btn-primary" id="nextStepBtn">Continue</button>
+            <button type="submit" class="btn btn-primary hidden" id="saveTradeBtn">Save Trade</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="./app.js"></script>
+</body>
+</html>
