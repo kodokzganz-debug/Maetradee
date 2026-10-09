@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#060811">
+  <meta name="description" content="MAETRADE — Personal Trading Operating System">
+  <title>MAETRADE — Trading Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="background" aria-hidden="true">
+    <div class="stars"></div><div class="noise"></div>
+    <div class="orb orb-one"></div><div class="orb orb-two"></div><div class="orb orb-three"></div>
+  </div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">M.</div>
+        <div><div class="brand-name">MAE<span>TRADE</span></div><div class="brand-caption">PERSONAL TRADING OS</div></div>
+      </div>
+      <div class="workspace-switcher">
+        <div class="workspace-avatar">MT</div>
+        <div class="workspace-copy"><strong>My Trading Desk</strong><span>Personal workspace</span></div>
+        <span class="chevron">⌄</span>
+      </div>
+      <nav class="navigation" aria-label="Navigasi utama">
+        <div class="nav-group">
+          <span class="nav-label">WORKSPACE</span>
+          <button class="nav-item active" data-page="dashboard"><span class="nav-icon">⌂</span>Lobby</button>
+          <button class="nav-item" data-page="analysis"><span class="nav-icon">⌁</span>Technical Analysis</button>
+          <button class="nav-item" data-page="journal"><span class="nav-icon">▤</span>Trading Journal</button>
+          <button class="nav-item" data-page="history"><span class="nav-icon">◷</span>Trade History</button>
+        </div>
+        <div class="nav-group">
+          <span class="nav-label">MANAGEMENT</span>
+          <button class="nav-item" data-page="cashflow"><span class="nav-icon">↗</span>Cashflow</button>
+          <button class="nav-item" data-page="reports"><span class="nav-icon">▥</span>Reports</button>
+          <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span>Settings</button>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="account-card"><div class="account-avatar">DM</div><div class="account-copy"><strong>Demo Trader</strong><span>Personal account</span></div><button class="more-button" aria-label="Account options">···</button></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Buka navigasi">☰</button>
+        <div class="mobile-brand">MAE<span>TRADE</span></div>
+        <div class="topbar-spacer"></div>
+        <div class="topbar-actions">
+          <button class="icon-button" id="exportBtn" title="Ekspor data" aria-label="Ekspor data">⇩</button>
+          <button class="icon-button" id="themeInfo" title="Status penyimpanan" aria-label="Status penyimpanan">◉</button>
+          <button class="profile-button"><span class="profile-avatar">DM</span><span class="profile-name">Demo Trader</span><span class="profile-arrow">⌄</span></button>
+        </div>
+      </header>
+
+      <section class="page active-page" id="page-dashboard">
+        <div class="page-heading">
+          <div><span class="eyebrow">PERSONAL TRADING OS / OVERVIEW</span><h1>Trading <span>Lobby</span></h1><p>Ringkasan aktivitas dan performa trading lu dalam satu workspace.</p></div>
+          <button class="primary-button" data-action="new-trade">＋ New Trade</button>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>NET PROFIT / LOSS</span><span class="stat-icon">↗</span></div><strong class="stat-value" id="statNet">Rp0</strong><div class="stat-bottom"><span>Closed trades</span><span id="statClosed">0 trades</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span>WIN RATE</span><span class="stat-icon">◎</span></div><strong class="stat-value" id="statWinRate">0%</strong><div class="stat-bottom"><span>Winning trades</span><span id="statWins">0 wins</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span>TOTAL TRADES</span><span class="stat-icon">⌁</span></div><strong class="stat-value" id="statTotal">0</strong><div class="stat-bottom"><span>Open positions</span><span id="statOpen">0 open</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span>PROFIT FACTOR</span><span class="stat-icon">◈</span></div><strong class="stat-value" id="statPF">—</strong><div class="stat-bottom"><span>Gross profit / loss</span><span>Closed trades only</span></div></article>
+        </div>
+        <div class="dashboard-grid">
+          <article class="glass-card">
+            <div class="card-header"><div><span class="card-eyebrow">PERFORMANCE</span><h2>Equity overview</h2></div><div class="period-group"><button class="period-button active" data-period="all">ALL</button><button class="period-button" data-period="30">30D</button><button class="period-button" data-period="7">7D</button></div></div>
+            <div class="chart-wrap"><canvas id="equityChart" aria-label="Grafik equity"></canvas><div class="chart-empty" id="chartEmpty"><div class="empty-icon">⌁</div><strong>Belum ada data performa</strong><p>Tambahkan trade dan tutup posisi dengan hasil P/L untuk mulai membangun kurva equity.</p></div></div>
+          </article>
+          <article class="glass-card recent-card">
+            <div class="card-header"><div><span class="card-eyebrow">ACTIVITY</span><h2>Recent trades</h2></div><button class="text-button" data-goto="history">View all ↗</button></div>
+            <div class="recent-list" id="recentList"><div class="empty-state compact"><div class="empty-circle">◷</div><strong>Belum ada transaksi</strong><p>Catat trade pertama lu untuk mulai tracking.</p><button class="secondary-button" data-action="new-trade">＋ Add trade</button></div></div>
+          </article>
+        </div>
+        <article class="glass-card market-card">
+          <div class="card-header"><div><span class="card-eyebrow">WATCHLIST</span><h2>Market focus</h2></div><span class="card-eyebrow">MANUAL REFERENCE</span></div>
+          <div class="watchlist">
+            <button class="watch-item" data-symbol="XAUUSD"><div class="asset"><span class="asset-icon gold">Au</span><span><strong>XAUUSD</strong><small>Gold / US Dollar</small></span></div><span class="watch-price"><strong>Gold</strong><small>Track your setup</small></span></button>
+            <button class="watch-item" data-symbol="EURUSD"><div class="asset"><span class="asset-icon eur">€</span><span><strong>EURUSD</strong><small>Euro / US Dollar</small></span></div><span class="watch-price"><strong>Forex</strong><small>Track your setup</small></span></button>
+            <button class="watch-item" data-symbol="BTCUSD"><div class="asset"><span class="asset-icon btc">₿</span><span><strong>BTCUSD</strong><small>Bitcoin / US Dollar</small></span></div><span class="watch-price"><strong>Crypto</strong><small>Track your setup</small></span></button>
+          </div>
+        </article>
+      </section>
+
+      <section class="page" id="page-analysis">
+        <div class="page-heading"><div><span class="eyebrow">WORKSPACE / MARKET PREPARATION</span><h1>Technical <span>Analysis</span></h1><p>Dokumentasikan bias, level penting, dan rencana sebelum entry.</p></div><button class="primary-button" data-action="new-trade">＋ Log trade plan</button></div>
+        <article class="glass-card"><div class="workspace-placeholder"><div class="large-icon">⌁</div><h2>Analysis workspace</h2><p>Gunakan halaman ini sebagai pengingat untuk membuat rencana sebelum entry. Chart harga real-time belum terhubung ke broker atau feed market.</p><div class="feature-pills"><span>Market bias</span><span>Key levels</span><span>Entry / SL / TP</span><span>SMC notes</span></div></div></article>
+      </section>
+
+      <section class="page" id="page-journal">
+        <div class="page-heading"><div><span class="eyebrow">WORKSPACE / PROCESS</span><h1>Trading <span>Journal</span></h1><p>Catat alasan entry, setup, dan psikologi di balik setiap transaksi.</p></div><button class="primary-button" data-action="new-trade">＋ New Trade</button></div>
+        <article class="glass-card journal-card">
+          <div class="journal-toolbar"><span class="journal-count" id="journalCount">0 records</span><div class="journal-filters"><button class="filter-button active" data-filter="ALL">All trades</button><button class="filter-button" data-filter="OPEN">Open</button><button class="filter-button" data-filter="CLOSED">Closed</button></div></div>
+          <div class="trade-table-wrap"><table class="trade-table"><thead><tr><th>SYMBOL</th><th>SIDE</th><th>ENTRY</th><th>STOP LOSS</th><th>TAKE PROFIT</th><th>STATUS</th><th>NET P/L</th><th>ACTIONS</th></tr></thead><tbody id="tradeRows"></tbody></table></div>
+          <div class="journal-empty" id="journalEmpty"><div class="empty-circle">▤</div><h2>Journal masih kosong</h2><p>Trade yang lu catat akan muncul di sini.</p><button class="primary-button" data-action="new-trade">＋ Catat trade pertama</button></div>
+        </article>
+      </section>
+
+      <section class="page" id="page-history">
+        <div class="page-heading"><div><span class="eyebrow">WORKSPACE / RECORDS</span><h1>Trade <span>History</span></h1><p>Semua posisi yang tersimpan di browser ini.</p></div><button class="secondary-button" id="historyExport">⇩ Export CSV</button></div>
+        <article class="glass-card journal-card"><div class="journal-toolbar"><span class="journal-count" id="historyCount">0 records</span><button class="secondary-button" data-action="new-trade">＋ New Trade</button></div><div class="trade-table-wrap"><table class="trade-table"><thead><tr><th>SYMBOL</th><th>SIDE</th><th>ENTRY</th><th>STOP LOSS</th><th>TAKE PROFIT</th><th>STATUS</th><th>NET P/L</th><th>ACTIONS</th></tr></thead><tbody id="historyRows"></tbody></table></div><div class="journal-empty" id="historyEmpty"><div class="empty-circle">◷</div><h2>Belum ada history</h2><p>Transaksi yang dibuat akan tersimpan di browser.</p></div></article>
+      </section>
+
+      <section class="page" id="page-cashflow">
+        <div class="page-heading"><div><span class="eyebrow">MANAGEMENT / CAPITAL</span><h1>Cash<span>flow</span></h1><p>Pantau hasil transaksi dan alur modal trading.</p></div><button class="secondary-button" data-action="new-trade">＋ Add trade</button></div>
+        <div class="cashflow-grid"><article class="glass-card mini-card"><span>NET REALIZED P/L</span><strong id="cashNet">Rp0</strong><small>Hasil trade closed</small></article><article class="glass-card mini-card"><span>GROSS PROFIT</span><strong id="cashGross">Rp0</strong><small>Total trade profit</small></article><article class="glass-card mini-card"><span>GROSS LOSS</span><strong id="cashLoss">Rp0</strong><small>Total nilai kerugian</small></article></div>
+        <article class="glass-card"><div class="workspace-placeholder small-placeholder"><div class="large-icon">↗</div><h2>Cashflow tracker</h2><p>Versi ini menghitung P/L dari transaksi yang lu catat. Deposit, withdrawal, swap, dan komisi belum dicatat terpisah.</p></div></article>
+      </section>
+
+      <section class="page" id="page-reports">
+        <div class="page-heading"><div><span class="eyebrow">MANAGEMENT / INSIGHTS</span><h1>Trading <span>Reports</span></h1><p>Ringkasan metrik berdasarkan transaksi closed.</p></div><button class="secondary-button" id="reportExport">⇩ Export data</button></div>
+        <div class="stats-grid"><article class="stat-card"><div class="stat-top"><span>AVERAGE WIN</span></div><strong class="stat-value" id="avgWin">Rp0</strong><div class="stat-bottom"><span>Per winning trade</span></div></article><article class="stat-card"><div class="stat-top"><span>AVERAGE LOSS</span></div><strong class="stat-value" id="avgLoss">Rp0</strong><div class="stat-bottom"><span>Per losing trade</span></div></article><article class="stat-card"><div class="stat-top"><span>EXPECTANCY</span></div><strong class="stat-value" id="expectancy">Rp0</strong><div class="stat-bottom"><span>Average P/L per closed trade</span></div></article><article class="stat-card"><div class="stat-top"><span>BEST TRADE</span></div><strong class="stat-value" id="bestTrade">Rp0</strong><div class="stat-bottom"><span>Highest realized P/L</span></div></article></div>
+        <article class="glass-card"><div class="workspace-placeholder small-placeholder"><div class="large-icon">▥</div><h2>Review the process, not just the result</h2><p>Metrik hanya berguna kalau data trade dicatat secara konsisten. Jangan menilai strategi dari sampel transaksi yang terlalu sedikit.</p></div></article>
+      </section>
+
+      <section class="page" id="page-settings">
+        <div class="page-heading"><div><span class="eyebrow">MANAGEMENT / PREFERENCES</span><h1>Set<span>tings</span></h1><p>Pengaturan dasar workspace dan pengelolaan data.</p></div></div>
+        <article class="glass-card settings-card">
+          <div class="setting-row"><div><strong>Data storage</strong><span>Data tersimpan di localStorage browser/perangkat ini.</span></div><span class="setting-value">LOCAL</span></div>
+          <div class="setting-row"><div><strong>Currency display</strong><span>Nilai P/L ditampilkan sebagai Rupiah. Masukkan nilai P/L dalam IDR.</span></div><span class="setting-value">IDR · Rp</span></div>
+          <div class="setting-row"><div><strong>Export backup</strong><span>Unduh salinan data untuk dipindahkan atau dicadangkan.</span></div><button class="secondary-button" id="settingsExport">Export JSON</button></div>
+          <div class="setting-row"><div><strong>Delete all local data</strong><span>Tindakan ini menghapus semua transaksi dari browser ini.</span></div><button class="secondary-button" id="clearData">Clear data</button></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="tradeModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <form class="modal" id="tradeForm">
+      <div class="modal-header"><div><span class="eyebrow">TRADE MANAGEMENT</span><h2 id="modalTitle">Create new trade</h2></div><button type="button" class="modal-close" id="closeModal" aria-label="Tutup">×</button></div>
+      <div class="form-grid">
+        <label class="field"><span>Symbol</span><input name="symbol" required maxlength="20" placeholder="XAUUSD" value="XAUUSD"></label>
+        <div class="field"><span>Direction</span><div class="segmented"><button type="button" class="side-option active" data-side="BUY">BUY</button><button type="button" class="side-option" data-side="SELL">SELL</button></div><input type="hidden" name="side" value="BUY"></div>
+        <label class="field"><span>Entry price</span><input name="entry" type="number" step="any" min="0" required placeholder="e.g. 3500.00"></label>
+        <label class="field"><span>Stop loss <em>(optional)</em></span><input name="sl" type="number" step="any" min="0" placeholder="e.g. 3490.00"></label>
+        <label class="field"><span>Take profit <em>(optional)</em></span><input name="tp" type="number" step="any" min="0" placeholder="e.g. 3520.00"></label>
+        <label class="field"><span>Status</span><select name="status"><option value="OPEN">Open position</option><option value="CLOSED">Closed trade</option></select></label>
+        <label class="field"><span>Net P/L (IDR) <em>(isi jika closed)</em></span><input name="pl" type="number" step="any" placeholder="0"></label>
+        <label class="field"><span>Trade date</span><input name="date" type="datetime-local" required></label>
+        <label class="field full"><span>Setup / journal notes <em>(optional)</em></span><textarea name="notes" rows="3" maxlength="1200" placeholder="Kenapa entry? Bias, setup, emosi, dan pelajaran..."></textarea></label>
+      </div>
+      <div class="modal-footer"><button type="button" class="secondary-button" id="cancelModal">Cancel</button><button type="submit" class="primary-button">Save trade ↗</button></div>
+    </form>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./js/app.js" defer></script>
+</body>
+</html>
